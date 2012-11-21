@@ -1,4 +1,4 @@
-package pac.man.model;
+package pac.man.util;
 
 import android.graphics.Point;
 

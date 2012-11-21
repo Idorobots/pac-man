@@ -1,6 +1,6 @@
-package pac.man.model.movement;
+package pac.man.util;
 
-import pac.man.model.MyPoint;
+import pac.man.util.MyPoint;
 
 public enum Direction {
     UP(new MyPoint(0, -1)), RIGHT(new MyPoint(1, 0)), DOWN(new MyPoint(0, 1)), LEFT(new MyPoint(-1, 0));
@@ -16,5 +16,4 @@ public enum Direction {
     public MyPoint getCoords() {
         return coords;
     }
-    
 }
