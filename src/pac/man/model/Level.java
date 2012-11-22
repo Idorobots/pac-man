@@ -9,15 +9,16 @@ import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-public class Level {
-    public static final int BLOCK_SIZE = 14;
+import pac.man.util.Vector;
 
+public class Level {
     public static final int WALL         = 0x000000;
     public static final int ENEMY_SPAWN  = 0xff0000;
     public static final int PLAYER_SPAWN = 0x00ff00;
     public static final int POWER_SPAWN  = 0x0000ff;
     public static final int GOLD_SPAWN   = 0xffffff;
 
+    private int blockSize = 14;
     private int height = 0;
     private int width = 0;
 
@@ -27,9 +28,11 @@ public class Level {
 
     private Random random = new Random();
 
-    public Level(Bitmap layout) {
+    public Level(Bitmap layout, int displayW, int displayH) {
         width = layout.getWidth();
         height = layout.getHeight();
+
+        blockSize = (int) Math.min((double) displayW/(width-1), (double) displayH/(height-1));
 
         blocks = new ArrayList<Rect>();
         playerSpawns = new ArrayList<Rect>();
@@ -37,11 +40,10 @@ public class Level {
 
         for(int i = 0; i < height; ++i) {
             for(int j = 0; j < width; ++j) {
-                Rect r = new Rect(j*BLOCK_SIZE, i*BLOCK_SIZE,
-                                    (j+1)*BLOCK_SIZE, (i+1)*BLOCK_SIZE);
+                Rect r = new Rect(j*blockSize, i*blockSize,
+                                    (j+1)*blockSize, (i+1)*blockSize);
 
                 int pixel = layout.getPixel(j, i) & 0x00ffffff;
-                System.out.println(String.format("%d, %d = %x", j, i, pixel));
 
                 switch(pixel) {
                     case WALL:         blocks.add(r); break;
@@ -56,8 +58,25 @@ public class Level {
         }
     }
 
-    public void update(long dt, Character c) {
-       // TODO Handle player-wall collisions.
+    public void update(long dt, Canvas canvas, Character c) {
+        Rect p = c.getBoundingRect();
+
+        for(Rect b : blocks) {
+            if(Rect.intersects(p, b)) {
+                Vector speed = c.getSpeed();
+                speed.scale(-1.0);
+
+                c.setSpeed(speed);
+
+                do {
+                    c.update(dt, canvas); // reverse for a while
+                    p = c.getBoundingRect();
+                } while(Rect.intersects(p, b));
+
+                c.setSpeed(Vector.ZERO);
+                break;
+            }
+        }
     }
 
     public void draw(Canvas canvas) {
@@ -68,6 +87,9 @@ public class Level {
         for(Rect r : blocks) {
             canvas.drawRect(r, p);
         }
+
+        // NOTE Just for debugging purposes.
+        // TODO Remove
 
         p.setColor(Color.GREEN);
         for(Rect r : playerSpawns) {

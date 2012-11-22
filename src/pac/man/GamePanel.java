@@ -18,7 +18,8 @@ import pac.man.gfx.Animation;
 import pac.man.util.Vector;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
-    public static final int TIME_DELTA = 33;
+    public static final int TIME_DELTA = 10; //ms
+    public static final int SPEED_GAIN = 100; //pixels per second.
 
     MainThread thread;
 
@@ -38,18 +39,21 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder holder) {
         // TODO Implement relevant factories to do this crap here.
 
-        level = new Level(BitmapFactory.decodeResource(getResources(), R.raw.test_level));
+        level = new Level(BitmapFactory.decodeResource(getResources(), R.raw.test_level),
+                         getWidth(), getHeight());
 
         Animation[] animations = new Animation[2];
 
-        animations[0] = new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.pacdroid_idle), 1, 1000);
-        animations[1] = new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.pacdroid_moving), 4, 500);
+        animations[0] = new Animation(BitmapFactory.decodeResource(getResources(),
+                                      R.drawable.pacdroid_idle), 1, 1000);
+        animations[1] = new Animation(BitmapFactory.decodeResource(getResources(),
+                                      R.drawable.pacdroid_moving), 4, 500);
 
         Rect r = level.randomPlayerSpawn();
-        Point pos;
+        Vector pos;
 
-        if(r == null) pos = new Point(getWidth()/2, getHeight()/2);
-        else          pos = new Point(r.left, r.top);
+        if(r == null) pos = new Vector(getWidth()/2, getHeight()/2);
+        else          pos = new Vector(r.left, r.top);
 
         player = new Player(pos, animations);
 
@@ -74,7 +78,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-            player.handleMove((int) event.getX(), (int) event.getY(), getWidth(), getHeight());
+            Vector ppos = player.getPosition();
+            Vector psize = player.getSize();
+            Vector touch = new Vector(event.getX(), event.getY());
+
+            Vector direction = new Vector(touch.x - ppos.x - psize.x/2, touch.y - ppos.y - psize.y/2);
+
+            direction.normalize();
+            direction.scale(SPEED_GAIN);
+
+            // TODO Pass normalized direction maby?
+            player.handleMove(direction);
+
+            direction = player.getSpeed();
         }
 
         return true;
@@ -87,8 +103,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         player.draw(canvas);
     }
 
-    public void update(long dt, int canvasW, int canvasH) {
-        level.update(dt, player);
-        player.update(dt, canvasW, canvasH);
+    public void update(long dt, Canvas canvas) {
+        player.update(dt, canvas);
+        level.update(dt, canvas, player);
+        // NOTE Since level gets to modify player it should be updated _after_ the player.
     }
 }

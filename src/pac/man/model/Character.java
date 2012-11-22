@@ -1,7 +1,8 @@
 package pac.man.model;
 
-import android.graphics.Point;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Color;
 import android.graphics.Rect;
 
 import pac.man.util.Vector;
@@ -9,32 +10,45 @@ import pac.man.gfx.Animation;
 
 /** Klasa bazowa dla duszków i żółtka */
 public class Character {
-    protected Point size;
-    protected Point position;
+    protected Rect boundingRect;
+    protected Vector size;
+    protected Vector position;
     protected Vector speed = new Vector(0, 0);
 
-    boolean alive = true;
+    protected boolean alive = true;
 
     private Animation[] animations;
     private int currentAnimation = 0;
 
-    public Character(Point size, Point position, Animation[] animations) {
+    public Character(Vector size, Vector position, Animation[] animations) {
         assert position != null;
         assert animations != null;
 
         this.position = position;
         this.animations = animations;
         this.size = size;
+
+        this.boundingRect = new Rect((int) position.x, (int) position.y,
+                                     (int) (position.x + size.x), (int) (position.y + size.y));
     }
 
     public void draw(Canvas canvas) {
-        animations[currentAnimation].draw(position, canvas);
+        // NOTE Just for debugging purposes.
+        // TODO Remove
+        Paint p = new Paint();
+        p.setColor(Color.RED);
+        canvas.drawRect(boundingRect, p);
+
+        animations[currentAnimation].draw(boundingRect, canvas);
     }
 
-    public void update(long dt, int canvasW, int canvasH) {
+    public void update(long dt, Canvas canvas) {
+        int canvasW = canvas.getWidth();
+        int canvasH = canvas.getHeight();
+
         animations[currentAnimation].update(dt);
 
-        position.x += (int) (speed.x * dt/1000.0);
+        position.x += speed.x * dt/1000.0;
 
         if(position.x < -size.x) {
             position.x = canvasW;
@@ -43,7 +57,7 @@ public class Character {
             position.x = -size.x;
         }
 
-        position.y += (int) (speed.y * dt/1000.0);
+        position.y += speed.y * dt/1000.0;
 
         if(position.y < -size.y) {
             position.y = canvasH;
@@ -51,14 +65,20 @@ public class Character {
         else if(position.y > canvasH) {
             position.y = -size.y;
         }
+
+        boundingRect.left = (int) position.x;
+        boundingRect.right = (int) (position.x + size.x);
+        boundingRect.top = (int) (position.y);
+        boundingRect.bottom = (int) (position.y + size.y);
     }
 
-    public Point getPosition() {
+    public Vector getPosition() {
         return position;
     }
 
-    public void setPosition(Point pos) {
-        this.position = pos;
+    public void setPosition(Vector pos) {
+        this.position.x = pos.x;
+        this.position.y = pos.y;
     }
 
     public Vector getSpeed() {
@@ -66,11 +86,21 @@ public class Character {
     }
 
     public void setSpeed(Vector speed) {
-        this.speed = speed;
+        this.speed.x = speed.x;
+        this.speed.y = speed.y;
+    }
+
+    public Vector getSize() {
+        return size;
+    }
+
+    public void setSize(Vector size) {
+        this.size.x = size.x;
+        this.size.y = size.y;
     }
 
     public boolean isMoving() {
-        return Math.abs(speed.x) > 1.0 || Math.abs(speed.y) > 1.0;
+        return speed.length() >= 1.0;
     }
 
     public boolean isAlive() {
@@ -88,5 +118,9 @@ public class Character {
             currentAnimation = index;
             animations[index].reset();
         }
+    }
+
+    public Rect getBoundingRect() {
+        return boundingRect;
     }
 }

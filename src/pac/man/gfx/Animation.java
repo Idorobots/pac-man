@@ -25,9 +25,9 @@ public class Animation {
         sourceRect = new Rect(0, 0, spriteWidth, spriteHeight);
     }
 
-    public void draw(Point position, Canvas canvas) {
-        Rect destRect = new Rect(position.x, position.y,
-                                 position.x + spriteWidth, position.y + spriteHeight);
+    public void draw(Rect destRect, Canvas canvas) {
+        // Rect destRect = new Rect(position.x, position.y,
+        //                         position.x + spriteWidth, position.y + spriteHeight);
         canvas.drawBitmap(bitmap, sourceRect, destRect, null);
     }
 

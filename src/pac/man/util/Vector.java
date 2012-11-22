@@ -11,15 +11,23 @@ public class Vector {
         this.y = y;
     }
 
-    public Vector add(Vector another) {
-        // NOTE Makes a copy.
-        return new Vector(x + another.x, y + another.y);
+    public void add(Vector another) {
+        x += another.x;
+        y += another.y;
     }
 
-    public Vector scale(double k) {
+    public void scale(double k) {
         x = x * k;
         y = y * k;
+    }
 
-        return this;
+    public double length() {
+        return Math.sqrt(x*x + y*y);
+    }
+
+    public void normalize() {
+        double len = length();
+        x /= len;
+        y /= len;
     }
 }
