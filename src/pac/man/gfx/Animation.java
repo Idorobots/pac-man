@@ -48,4 +48,12 @@ public class Animation {
         currentFrame = 0;
         frameTicker = 0;
     }
+
+    public int getWidth() {
+        return spriteWidth;
+    }
+
+    public int getHeight() {
+        return spriteHeight;
+    }
 }

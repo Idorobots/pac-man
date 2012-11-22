@@ -1,6 +1,8 @@
 package pac.man.util;
 
 public class Vector {
+    public static final Vector ZERO = new Vector(0.0, 0.0);
+
     public double x;
     public double y;
 

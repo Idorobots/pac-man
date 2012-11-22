@@ -8,15 +8,15 @@ import pac.man.model.Character;
 public class Player extends Character {
 
     public Player(Point position, Animation[] animations) {
-        super(position, animations);
+        super(new Point(animations[0].getWidth(), animations[0].getHeight()), position, animations);
     }
 
     public void handleMove(int eventX, int eventY, int canvasW, int canvasH) {
+        // FIXME Should be handled by GamePanel, maby?
         int EDGE_WIDTH = 50;
         int SPEED_GAIN = 100;
 
         // FIXME Wat do when x and y are in the corner?
-
         if(eventY < EDGE_WIDTH) {
             speed.x = 0;
             speed.y = -SPEED_GAIN;
@@ -33,5 +33,14 @@ public class Player extends Character {
             speed.y = 0;
             speed.x = SPEED_GAIN;
         }
+    }
+
+    public void update(long dt, int canvasW, int canvasH) {
+        super.update(dt, canvasW, canvasH);
+
+        if(isMoving()) {
+            setActiveAnimation(1);
+        }
+        else setActiveAnimation(0);
     }
 }

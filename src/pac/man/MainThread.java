@@ -34,7 +34,7 @@ public class MainThread extends Thread {
 
                     while(accumulator > GamePanel.TIME_DELTA) {
                         accumulator -= GamePanel.TIME_DELTA;
-                        gamePanel.update(GamePanel.TIME_DELTA);
+                        gamePanel.update(GamePanel.TIME_DELTA, canvas.getWidth(), canvas.getHeight());
                     }
                     gamePanel.draw(canvas);
                 }
