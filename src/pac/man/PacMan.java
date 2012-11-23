@@ -13,9 +13,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 public class PacMan extends Activity {
-	
-    boolean isPaused = false;
 
+    private GamePanel gamePanel;
+
+    // TODO: powiązanie parametrów menu z parametrami gry
+    
     String nOpponentsPreference;
     String speedPreference;
 
@@ -54,13 +56,13 @@ public class PacMan extends Activity {
             return true;
 
         case R.id.menu_pause:
-            Toast.makeText(PacMan.this, "Pause is Selected", Toast.LENGTH_SHORT).show();
-            isPaused = true;
+            gamePanel.getThread().setRunning(false);
+            Toast.makeText(PacMan.this, "Game paused", Toast.LENGTH_SHORT).show();
             return true;
 
         case R.id.menu_resume:
-            Toast.makeText(PacMan.this, "Resume is Selected", Toast.LENGTH_SHORT).show();
-            isPaused = false;
+            gamePanel.getThread().setRunning(true);
+            Toast.makeText(PacMan.this, "Game resumed", Toast.LENGTH_SHORT).show();
             return true;
 
         default:
@@ -70,18 +72,18 @@ public class PacMan extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isPaused) {
-            menu.findItem(R.id.menu_resume).setVisible(true);
-            menu.findItem(R.id.menu_pause).setVisible(false);
-        } else {
+        if (gamePanel.getThread().getRunning()) {
             menu.findItem(R.id.menu_resume).setVisible(false);
             menu.findItem(R.id.menu_pause).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_resume).setVisible(true);
+            menu.findItem(R.id.menu_pause).setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
 
-    }	
-	
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,15 +91,27 @@ public class PacMan extends Activity {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(new GamePanel(this));
-        
-        // XXX: debug
-//        setContentView(R.layout.main);
+        gamePanel = new GamePanel(this);
+        setContentView(gamePanel);
     }
 
 //    @Override
-//    public void onStop() {
-//        super.onStop();
-//        System.exit(0);
+//    protected void onDestroy() {
+//        super.onDestroy();
+//
+//        boolean retry = true;
+//        while (retry) {
+//            try {
+//                gamePanel.getThread().join();
+//                retry = false;
+//            } catch (InterruptedException e) {
+//            }
+//        }
 //    }
+
+    @Override
+    public void onStop() {
+        gamePanel.getThread().setRunning(false);
+        super.onStop();
+    }
 }
