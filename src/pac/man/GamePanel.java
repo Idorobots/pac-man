@@ -42,12 +42,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         level = new Level(BitmapFactory.decodeResource(getResources(), R.raw.test_level),
                          getWidth(), getHeight());
 
-        Animation[] animations = new Animation[2];
+        Animation[] animations = new Animation[6];
 
         animations[0] = new Animation(BitmapFactory.decodeResource(getResources(),
-                                      R.drawable.pacdroid_idle), 1, 1000);
+                                      R.drawable.idle), 1, 1000);
         animations[1] = new Animation(BitmapFactory.decodeResource(getResources(),
-                                      R.drawable.pacdroid_moving), 4, 500);
+                                      R.drawable.right), 4, 500);
+        animations[2] = new Animation(BitmapFactory.decodeResource(getResources(),
+                                      R.drawable.up), 4, 500);
+        animations[3] = new Animation(BitmapFactory.decodeResource(getResources(),
+                                      R.drawable.left), 4, 500);
+        animations[4] = new Animation(BitmapFactory.decodeResource(getResources(),
+                                      R.drawable.down), 4, 500);
+        animations[5] = animations[0];
 
         Rect r = level.randomPlayerSpawn();
         Vector pos;

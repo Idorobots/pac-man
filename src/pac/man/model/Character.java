@@ -35,9 +35,9 @@ public class Character {
     public void draw(Canvas canvas) {
         // NOTE Just for debugging purposes.
         // TODO Remove
-        Paint p = new Paint();
-        p.setColor(Color.RED);
-        canvas.drawRect(boundingRect, p);
+        //Paint p = new Paint();
+        //p.setColor(Color.RED);
+        //canvas.drawRect(boundingRect, p);
 
         animations[currentAnimation].draw(boundingRect, canvas);
     }
