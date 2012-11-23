@@ -34,8 +34,6 @@ public class MainThread extends Thread {
             } catch (InterruptedException e) {
             }
 
-            System.out.println("running");
-
             // FIXME: w przypadku wtrzymania wątku trzeba reagować natychmiast,
             // a nie dopiero po paru(nastu) iteracjach związanych z akumulatorem
             canvas = null;
