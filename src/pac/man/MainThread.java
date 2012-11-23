@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
 public class MainThread extends Thread {
+    public static final int TIME_DELTA = 10; //ms
 
     private SurfaceHolder surfaceHolder;
     private GamePanel gamePanel;
@@ -32,9 +33,9 @@ public class MainThread extends Thread {
                     t0 += dt;
                     accumulator += dt;
 
-                    while(accumulator > GamePanel.TIME_DELTA) {
-                        accumulator -= GamePanel.TIME_DELTA;
-                        gamePanel.update(GamePanel.TIME_DELTA, canvas);
+                    while(accumulator > TIME_DELTA) {
+                        accumulator -= TIME_DELTA;
+                        gamePanel.update(TIME_DELTA, canvas);
                     }
                     gamePanel.draw(canvas);
                 }
