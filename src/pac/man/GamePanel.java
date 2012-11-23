@@ -13,16 +13,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import pac.man.model.Level;
+import pac.man.model.Strict4WayMovement;
 import pac.man.model.Player;
 import pac.man.gfx.Animation;
 import pac.man.util.Vector;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
-    public static final int TIME_DELTA = 10; //ms
-    public static final int SPEED_GAIN = 100; //pixels per second.
-
     MainThread thread;
-
     Player player;
     Level level;
 
@@ -66,9 +63,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         else          pos = new Vector(r.left, r.top);
 
         player = new Player(pos, animations);
-
-        player.setSpeed(new Vector(0.0, 100.0));
-        player.setActiveAnimation(1);        
+        player.setMovementAlgorithm(new Strict4WayMovement());
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -104,12 +99,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             Vector direction = new Vector(touch.x - ppos.x - psize.x/2, touch.y - ppos.y - psize.y/2);
 
             direction.normalize();
-            direction.scale(SPEED_GAIN);
-
-            // TODO Pass normalized direction maby?
             player.handleMove(direction);
-
-            direction = player.getSpeed();
         }
 
         return true;

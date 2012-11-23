@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import pac.man.util.Vector;
 import pac.man.gfx.Animation;
 
-/** Klasa bazowa dla duszków i żółtka */
 public class Character {
     protected Rect boundingRect;
     protected Vector size;
@@ -33,12 +32,6 @@ public class Character {
     }
 
     public void draw(Canvas canvas) {
-        // NOTE Just for debugging purposes.
-        // TODO Remove
-        //Paint p = new Paint();
-        //p.setColor(Color.RED);
-        //canvas.drawRect(boundingRect, p);
-
         animations[currentAnimation].draw(boundingRect, canvas);
     }
 
