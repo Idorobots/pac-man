@@ -17,11 +17,26 @@ public class MainThread extends Thread {
 
     @Override
     public void run() {
+        final int sleepInterval = 10;
+
         Canvas canvas;
         long t0 = System.currentTimeMillis();
         long accumulator = 0;
 
-        while (running) {
+        while (true) {
+            // Prevent other threads' starvation.
+            try {
+                synchronized (this) {
+                    while (!running)
+                        wait();
+                }
+            } catch (InterruptedException e) {
+            }
+
+            System.out.println("running");
+
+            // FIXME: w przypadku wtrzymania wątku trzeba reagować natychmiast,
+            // a nie dopiero po paru(nastu) iteracjach związanych z akumulatorem
             canvas = null;
             try {
                 canvas = this.surfaceHolder.lockCanvas();
@@ -32,7 +47,7 @@ public class MainThread extends Thread {
                     t0 += dt;
                     accumulator += dt;
 
-                    while(accumulator > GamePanel.TIME_DELTA) {
+                    while (accumulator > GamePanel.TIME_DELTA) {
                         accumulator -= GamePanel.TIME_DELTA;
                         gamePanel.update(GamePanel.TIME_DELTA, canvas);
                     }
@@ -47,7 +62,10 @@ public class MainThread extends Thread {
         }
     }
 
-    public void setRunning(boolean running) {
+    synchronized public void setRunning(boolean running) {
         this.running = running;
+
+        if (running)
+            notify();
     }
 }

@@ -30,13 +30,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
+        
+        init();
+        
+        System.out.println("GamePanel");
+        
         thread = new MainThread(getHolder(), this);
+        thread.start();
     }
-
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
-
-    public void surfaceCreated(SurfaceHolder holder) {
+    
+    private void init() {
         // TODO Implement relevant factories to do this crap here.
 
         level = new Level(BitmapFactory.decodeResource(getResources(), R.raw.test_level),
@@ -65,21 +68,30 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         player = new Player(pos, animations);
 
         player.setSpeed(new Vector(0.0, 100.0));
-        player.setActiveAnimation(1);
+        player.setActiveAnimation(1);        
+    }
 
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
+
+    public void surfaceCreated(SurfaceHolder holder) {
         thread.setRunning(true);
-        thread.start();
+        
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        boolean retry = true;
-        while (retry) {
-            try {
-                thread.join();
-                retry = false;
-            } catch (InterruptedException e) {
-            }
-        }
+        System.out.println("surface destroyed");
+        thread.setRunning(false);
+        
+        // INFO: Jeśli chcemy ubić proces, to tylko w głównej Activity, w metodzie onDestroy().
+//      boolean retry = true;
+//      while (retry) {
+//          try {
+//              thread.join();
+//              retry = false;
+//          } catch (InterruptedException e) {
+//          }
+//      }
     }
 
     @Override

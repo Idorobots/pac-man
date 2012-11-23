@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PacMan</string>
+    
+    <string name="menu_settings">Settings</string>
+
+    <string-array name="opponent_arrays">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array> 
+    
+    <string-array name="speed_arrays">
+        <item>Slow</item>
+        <item>Normal</item>
+        <item>Fast</item>
+    </string-array> 
+    
+    <string name="set_preferences">Preferences</string>    
 </resources>
