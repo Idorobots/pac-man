@@ -1,23 +1,19 @@
 package pac.man;
 
-import android.R.bool;
+import pac.man.SoundManager.Sound;
+import pac.man.gfx.Animation;
+import pac.man.model.Level;
+import pac.man.model.Player;
+import pac.man.model.Strict4WayMovement;
+import pac.man.util.Vector;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
-
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import pac.man.model.Level;
-import pac.man.model.Strict4WayMovement;
-import pac.man.model.Player;
-import pac.man.gfx.Animation;
-import pac.man.util.Vector;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     MainThread thread;
@@ -102,6 +98,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
             direction.normalize();
             player.handleMove(direction);
+            
+            // XXX: test
+            SoundManager.play(Sound.SAMPLE1);
         }
 
         return true;

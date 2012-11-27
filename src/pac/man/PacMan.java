@@ -3,6 +3,7 @@ package pac.man;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -20,7 +21,7 @@ public class PacMan extends Activity {
     
     String nOpponentsPreference;
     String speedPreference;
-
+    
     private void getPrefs() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         speedPreference = prefs.getString("speedPref", "Normal");
@@ -88,11 +89,15 @@ public class PacMan extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         gamePanel = new GamePanel(this);
         setContentView(gamePanel);
+        
+        // Set the hardware buttons to control the music
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        
+        SoundManager.init(this);
     }
 
 //    @Override
@@ -114,4 +119,5 @@ public class PacMan extends Activity {
         gamePanel.getThread().setRunning(false);
         super.onStop();
     }
+    
 }
