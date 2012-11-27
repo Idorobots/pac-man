@@ -48,14 +48,25 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         animations.put(AnimationType.IDLE, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.idle),
                 1, 1000));
 
+//        animations.put(AnimationType.RIGHT,
+//                new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.right), 4, 500));
+//        animations.put(AnimationType.UP, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.up), 4,
+//                500));
+//        animations.put(AnimationType.LEFT, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.left),
+//                4, 500));
+//        animations.put(AnimationType.DOWN, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.down),
+//                4, 500));
+
+        // Test animacji duszka.
         animations.put(AnimationType.RIGHT,
-                new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.right), 4, 500));
-        animations.put(AnimationType.UP, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.up), 4,
+                new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_right), 2, 500));
+        animations.put(AnimationType.UP, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_up), 2,
                 500));
-        animations.put(AnimationType.LEFT, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.left),
-                4, 500));
-        animations.put(AnimationType.DOWN, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.down),
-                4, 500));
+        animations.put(AnimationType.LEFT, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_left),
+                2, 500));
+        animations.put(AnimationType.DOWN, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_down),
+                2, 500));
+        
         animations.put(AnimationType.DEATH, new Animation(
                 BitmapFactory.decodeResource(getResources(), R.drawable.idle), 1, 1000));
 
