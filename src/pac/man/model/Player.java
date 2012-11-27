@@ -1,5 +1,7 @@
 package pac.man.model;
 
+import java.util.Map;
+
 import android.graphics.Canvas;
 import android.graphics.Point;
 
@@ -7,15 +9,17 @@ import pac.man.util.Vector;
 import pac.man.gfx.Animation;
 import pac.man.model.Character;
 import pac.man.model.MovementAlgorithm;
+import pac.man.model.Character.AnimationType;
 
 public class Player extends Character {
 
     private MovementAlgorithm movementAlgorithm;
 
-    public Player(Vector position, Animation[] animations) {
-        super(new Vector(animations[0].getWidth(), animations[0].getHeight()), position, animations);
+    public Player(Vector position, Map<AnimationType, Animation> animations) {
+        super(new Vector(animations.values().iterator().next().getWidth(),
+                animations.values().iterator().next().getHeight()), position, animations);
 
-        assert animations.length >= 6;
+        assert animations.keySet().size() >= 6;
 
         // Animations:
         // - 0 - idle
@@ -79,18 +83,26 @@ public class Player extends Character {
         // ...so we add extra 45 degrees to the angle rotating the coordinate system.
 
         int index = 1 + (int) (((angle + 45) % 360) / 90);
-
-        setActiveAnimation(index);
+        
+        // XXX: niezbyt ładne, ale skuteczne ; )
+        AnimationType animationType = null;
+        switch (index) {
+            case 1: animationType = AnimationType.RIGHT; break;
+            case 2: animationType = AnimationType.UP; break;
+            case 3: animationType = AnimationType.LEFT; break;
+            case 4: animationType = AnimationType.DOWN; break;
+        }
+        setActiveAnimation(animationType);
     }
 
     public void update(long dt, Canvas canvas) {
         super.update(dt, canvas);
 
         if(!isAlive()) {
-            setActiveAnimation(5);
+            setActiveAnimation(AnimationType.DEATH);
         }
         else if(!isMoving()) {
-            setActiveAnimation(0);
+            setActiveAnimation(AnimationType.IDLE);
         }
     }
 
