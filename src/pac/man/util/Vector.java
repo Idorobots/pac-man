@@ -11,23 +11,32 @@ public class Vector {
         this.y = y;
     }
 
+    public Vector(Vector vec) {
+        this.x = vec.x;
+        this.y = vec.y;
+    }
+
     public void add(Vector another) {
         x += another.x;
         y += another.y;
     }
 
-    public void scale(double k) {
+    public Vector scale(double k) {
         x = x * k;
         y = y * k;
+        
+        return this;
     }
 
     public double length() {
         return Math.sqrt(x*x + y*y);
     }
 
-    public void normalize() {
+    public Vector normalize() {
         double len = length();
         x /= len;
         y /= len;
+        
+        return this;
     }
 }
