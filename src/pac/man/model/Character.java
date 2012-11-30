@@ -1,5 +1,7 @@
 package pac.man.model;
 
+import java.util.Map;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
@@ -9,6 +11,11 @@ import pac.man.util.Vector;
 import pac.man.gfx.Animation;
 
 public class Character {
+
+    public static enum AnimationType {
+        IDLE, RIGHT, UP, LEFT, DOWN, DEATH
+    }
+
     protected Rect boundingRect;
     protected Vector size;
     protected Vector position;
@@ -16,10 +23,10 @@ public class Character {
 
     protected boolean alive = true;
 
-    private Animation[] animations;
-    private int currentAnimation = 0;
+    private Map<AnimationType, Animation> animations;
+    private AnimationType currentAnimation = AnimationType.IDLE;
 
-    public Character(Vector size, Vector position, Animation[] animations) {
+    public Character(Vector size, Vector position, Map<AnimationType, Animation> animations) {
         assert position != null;
         assert animations != null;
 
@@ -27,35 +34,33 @@ public class Character {
         this.animations = animations;
         this.size = size;
 
-        this.boundingRect = new Rect((int) position.x, (int) position.y,
-                                     (int) (position.x + size.x), (int) (position.y + size.y));
+        this.boundingRect = new Rect((int) position.x, (int) position.y, (int) (position.x + size.x),
+                (int) (position.y + size.y));
     }
 
     public void draw(Canvas canvas) {
-        animations[currentAnimation].draw(boundingRect, canvas);
+        animations.get(currentAnimation).draw(boundingRect, canvas);
     }
 
     public void update(long dt, Canvas canvas) {
         int canvasW = canvas.getWidth();
         int canvasH = canvas.getHeight();
 
-        animations[currentAnimation].update(dt);
+        animations.get(currentAnimation).update(dt);
 
-        position.x += speed.x * dt/1000.0;
+        position.x += speed.x * dt / 1000.0;
 
-        if(position.x < -size.x) {
+        if (position.x < -size.x) {
             position.x = canvasW;
-        }
-        else if(position.x > canvasW) {
+        } else if (position.x > canvasW) {
             position.x = -size.x;
         }
 
-        position.y += speed.y * dt/1000.0;
+        position.y += speed.y * dt / 1000.0;
 
-        if(position.y < -size.y) {
+        if (position.y < -size.y) {
             position.y = canvasH;
-        }
-        else if(position.y > canvasH) {
+        } else if (position.y > canvasH) {
             position.y = -size.y;
         }
 
@@ -104,12 +109,10 @@ public class Character {
         alive = state;
     }
 
-    public void setActiveAnimation(int index) {
-        assert index < animations.length;
-
-        if(currentAnimation != index) {
+    public void setActiveAnimation(AnimationType index) {
+        if (currentAnimation != index) {
             currentAnimation = index;
-            animations[index].reset();
+            animations.get(index).reset();
         }
     }
 

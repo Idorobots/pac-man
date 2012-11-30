@@ -1,10 +1,22 @@
 package pac.man;
 
+
+import pac.man.model.MovementAlgorithm;
+import pac.man.model.MovementAlgorithm.Speed;
+import pac.man.model.Player;
+import pac.man.util.Vector;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,17 +24,34 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class PacMan extends Activity {
-	
-    boolean isPaused = false;
+public class PacMan extends Activity implements SensorEventListener {
 
-    String nOpponentsPreference;
-    String speedPreference;
+    private GamePanel gamePanel = null;
+
+    // Accelerometer
+    private float mLastX, mLastY;
+    private boolean mInitialized;
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
 
     private void getPrefs() {
+        // TODO: powiązanie parametrów menu z parametrami gry
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        speedPreference = prefs.getString("speedPref", "Normal");
-        nOpponentsPreference = prefs.getString("opponentsPref", "4");
+        String speedPreference = prefs.getString("speedPref", "Normal");
+        String nOpponentsPreference = prefs.getString("opponentsPref", "4");
+        
+        for (Speed s : Speed.values()) {
+            if (s.getLabel().equals(speedPreference)) {
+                MovementAlgorithm.setSpeed(s);
+                System.out.println(s.getGain());
+            }
+        }
+        
+        if (gamePanel != null && gamePanel.player != null) {
+            Player p = gamePanel.player;
+            Vector speed = new Vector(p.getSpeed().normalize().scale(MovementAlgorithm.getSpeed().getGain()));
+            p.setSpeed(speed);
+        }
     }
 
     @Override
@@ -54,13 +83,13 @@ public class PacMan extends Activity {
             return true;
 
         case R.id.menu_pause:
-            Toast.makeText(PacMan.this, "Pause is Selected", Toast.LENGTH_SHORT).show();
-            isPaused = true;
+            gamePanel.getThread().setRunning(false);
+            Toast.makeText(PacMan.this, "Game paused", Toast.LENGTH_SHORT).show();
             return true;
 
         case R.id.menu_resume:
-            Toast.makeText(PacMan.this, "Resume is Selected", Toast.LENGTH_SHORT).show();
-            isPaused = false;
+            gamePanel.getThread().setRunning(true);
+            Toast.makeText(PacMan.this, "Game resumed", Toast.LENGTH_SHORT).show();
             return true;
 
         default:
@@ -70,34 +99,112 @@ public class PacMan extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isPaused) {
-            menu.findItem(R.id.menu_resume).setVisible(true);
-            menu.findItem(R.id.menu_pause).setVisible(false);
-        } else {
+        if (gamePanel.getThread().getRunning()) {
             menu.findItem(R.id.menu_resume).setVisible(false);
             menu.findItem(R.id.menu_pause).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_resume).setVisible(true);
+            menu.findItem(R.id.menu_pause).setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
 
-    }	
-	
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(new GamePanel(this));
-        
-        // XXX: debug
-//        setContentView(R.layout.main);
+        gamePanel = new GamePanel(this);
+        setContentView(gamePanel);
+
+        // Set the hardware buttons to control the music
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        SoundManager.init(this);
+
+        mInitialized = false;
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        System.exit(0);
-//    }
+    // @Override
+    // protected void onDestroy() {
+    // super.onDestroy();
+    //
+    // boolean retry = true;
+    // while (retry) {
+    // try {
+    // gamePanel.getThread().join();
+    // retry = false;
+    // } catch (InterruptedException e) {
+    // }
+    // }
+    // }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        gamePanel.getThread().setRunning(false);
+        super.onStop();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        final double RESTART_ACCELERATION_THRESHOLD = 8.0;
+
+        float x = event.values[0];
+        float y = event.values[1];
+
+        if (!mInitialized) {
+            mLastX = x;
+            mLastY = y;
+            mInitialized = true;
+        } else {
+            float deltaX = Math.abs(mLastX - x);
+            float deltaY = Math.abs(mLastY - y);
+
+            if (deltaX > RESTART_ACCELERATION_THRESHOLD || deltaY > RESTART_ACCELERATION_THRESHOLD) {
+                gamePanel.restartLevel();
+//                gamePanel.getThread().setRunning(!gamePanel.getThread().getRunning());
+            }
+
+            mLastX = x;
+            mLastY = y;
+        }
+    }
+    
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+//            if (gamePanel.getThread().is)
+            gamePanel.getThread().setRunning(false);
+        }
+
+        return super.onKeyUp(keyCode, event);
+    }
+
+    
+
 }

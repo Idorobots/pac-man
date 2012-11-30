@@ -18,10 +18,6 @@ public class Strict4WayMovement extends MovementAlgorithm {
         speeds[1] = new Vector(0.0, -1.0);
         speeds[2] = new Vector(-1.0, 0.0);
         speeds[3] = new Vector(0.0, 1.0);
-
-        for(Vector speed : speeds) {
-            speed.scale(MovementAlgorithm.SPEED_GAIN);
-        }
     }
 
     public Vector computeSpeed(Vector position, Vector currentSpeed, Vector preferredDir) {
@@ -30,7 +26,7 @@ public class Strict4WayMovement extends MovementAlgorithm {
         long angle = 360L + Math.round(Math.toDegrees(Math.atan2(-preferredDir.y, preferredDir.x)));
         long index = ((angle + 45) % 360) / 90;
 
-
-        return speeds[(int) index];
+        Vector vec = new Vector(speeds[(int) index]);
+        return vec.scale(MovementAlgorithm.getSpeed().getGain());
     }
 }
