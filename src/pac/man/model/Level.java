@@ -59,6 +59,8 @@ public class Level {
     }
 
     public void update(long dt, Canvas canvas, Character c) {
+        if(!c.isMoving()) return; // No need to do anything.
+
         Rect p = c.getBoundingRect();
 
         for(Rect b : blocks) {

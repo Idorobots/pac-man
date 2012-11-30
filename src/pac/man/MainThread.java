@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
 public class MainThread extends Thread {
-    public static final int TIME_DELTA = 10; //ms
+    public static final int TIME_DELTA = 20; // 20 ms <=> 50 FPS
 
     private SurfaceHolder surfaceHolder;
     private GamePanel gamePanel;
