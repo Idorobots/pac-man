@@ -14,7 +14,6 @@ import android.view.SurfaceView;
 
 import android.content.Context;
 
-import pac.man.SoundManager.Sound;
 import pac.man.util.Vector;
 import pac.man.util.Animation;
 
@@ -31,6 +30,7 @@ import pac.man.ctrl.BouncyCollisions;
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     MainThread thread;
     ResourceManager resMgr;
+
     Player player;
     Level level;
     Ghost ghost;
@@ -43,7 +43,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         setFocusable(true);
 
-        resMgr = new ResourceManager(this);
+        resMgr = new ResourceManager(this, context);
 
         thread = new MainThread(getHolder(), this);
         thread.start();
@@ -51,16 +51,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private void init() {
         initalized = true;
-        // TODO Implement relevant factories to do this crap here.
 
-        level = resMgr.getLevel(R.raw.test_level);
+        resMgr.loadSound(R.raw.sound);
+
+        level = resMgr.getLevel(R.raw.test_level2);
         level.setCollisionHandler(new BouncyCollisions());
 
         Map<Character.AnimationType, Animation> animations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
         Map<Character.AnimationType, Animation> ghostAnimations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
-
 
         // Player animootions.
         animations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.idle, 1, 1000));
@@ -87,7 +87,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         ghost = new Ghost(new Vector(g.left, g.top), ghostAnimations);
         ghost.setMovementAlgorithm(new Strict4WayMovement());
-        ghost.setMovementStrategy(new SimpleChaseStrategy(player, 100.0));
+        ghost.setMovementStrategy(new SimpleChaseStrategy(player, 100.0, 1.0));
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -136,7 +136,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             player.handleMove(direction);
 
             // XXX: test
-            // SoundManager.play(Sound.SAMPLE1);
+            // resMgr.playSound(R.raw.sound);
         }
 
         return true;

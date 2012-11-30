@@ -27,11 +27,14 @@ public class Level {
     private ArrayList<Rect> blocks;
     private ArrayList<Rect> enemySpawns;
     private ArrayList<Rect> playerSpawns;
+    private ArrayList<Rect> powerSpawns;
 
     private CollisionHandler collisionHandler;
     private Random random = new Random();
 
     public Level(Bitmap layout, int displayW, int displayH) {
+        // TODO Rect merging.
+
         width = layout.getWidth();
         height = layout.getHeight();
 
@@ -40,6 +43,7 @@ public class Level {
         blocks = new ArrayList<Rect>();
         playerSpawns = new ArrayList<Rect>();
         enemySpawns = new ArrayList<Rect>();
+        powerSpawns = new ArrayList<Rect>();
 
         for(int i = 0; i < height; ++i) {
             for(int j = 0; j < width; ++j) {
@@ -52,7 +56,7 @@ public class Level {
                     case WALL:         blocks.add(r); break;
                     case ENEMY_SPAWN:  enemySpawns.add(r); break;
                     case PLAYER_SPAWN: playerSpawns.add(r); break;
-                    case POWER_SPAWN:  break; // TODO
+                    case POWER_SPAWN:  powerSpawns.add(r); break;
                     case GOLD_SPAWN:   break; // TODO
 
                     default: System.out.println(String.format("Bad level data: %x", pixel));
@@ -100,6 +104,10 @@ public class Level {
             canvas.drawRect(r, p);
         }
 
+        p.setColor(Color.YELLOW);
+        for(Rect r : powerSpawns) {
+            canvas.drawRect(r, p);
+        }
     }
 
     public Rect randomPlayerSpawn() {
