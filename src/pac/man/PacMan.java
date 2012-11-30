@@ -1,28 +1,31 @@
 package pac.man;
 
-
-import pac.man.model.MovementAlgorithm;
-import pac.man.model.MovementAlgorithm.Speed;
-import pac.man.model.Player;
-import pac.man.util.Vector;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioManager;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
+
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+
+import android.app.Activity;
+import android.media.AudioManager;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import pac.man.ctrl.MovementAlgorithm;
+import pac.man.ctrl.MovementAlgorithm.Speed;
+import pac.man.model.Player;
+import pac.man.util.Vector;
 
 public class PacMan extends Activity implements SensorEventListener {
 
@@ -39,14 +42,14 @@ public class PacMan extends Activity implements SensorEventListener {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String speedPreference = prefs.getString("speedPref", "Normal");
         String nOpponentsPreference = prefs.getString("opponentsPref", "4");
-        
+
         for (Speed s : Speed.values()) {
             if (s.getLabel().equals(speedPreference)) {
                 MovementAlgorithm.setSpeed(s);
                 System.out.println(s.getGain());
             }
         }
-        
+
         if (gamePanel != null && gamePanel.player != null) {
             Player p = gamePanel.player;
             Vector speed = new Vector(p.getSpeed().normalize().scale(MovementAlgorithm.getSpeed().getGain()));
@@ -193,10 +196,10 @@ public class PacMan extends Activity implements SensorEventListener {
             mLastY = y;
         }
     }
-    
+
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        
+
         if (keyCode == KeyEvent.KEYCODE_MENU) {
 //            if (gamePanel.getThread().is)
             gamePanel.getThread().setRunning(false);
@@ -204,7 +207,4 @@ public class PacMan extends Activity implements SensorEventListener {
 
         return super.onKeyUp(keyCode, event);
     }
-
-    
-
 }

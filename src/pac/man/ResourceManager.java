@@ -2,8 +2,7 @@ package pac.man;
 
 import android.graphics.BitmapFactory;
 
-import pac.man.GamePanel;
-import pac.man.gfx.Animation;
+import pac.man.util.Animation;
 import pac.man.model.Level;
 
 public class ResourceManager {

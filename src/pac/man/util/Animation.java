@@ -1,4 +1,4 @@
-package pac.man.gfx;
+package pac.man.util;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

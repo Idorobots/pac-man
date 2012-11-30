@@ -24,7 +24,19 @@ public class Vector {
     public Vector scale(double k) {
         x = x * k;
         y = y * k;
-        
+
+        return this;
+    }
+
+    public Vector rotate(double angle) {
+        angle = Math.toRadians(angle);
+
+        double xp = x * Math.cos(angle) - y * Math.sin(angle);
+        double yp = x * Math.sin(angle) + y * Math.cos(angle);
+
+        x = xp;
+        y = yp;
+
         return this;
     }
 
@@ -36,7 +48,18 @@ public class Vector {
         double len = length();
         x /= len;
         y /= len;
-        
+
         return this;
+    }
+
+    public double distanceTo(Vector v) {
+        return Math.sqrt(distanceSquaredTo(v));
+    }
+
+    public double distanceSquaredTo(Vector v) {
+        double dx = v.x - x;
+        double dy = v.y - y;
+
+        return dx*dx + dy*dy;
     }
 }

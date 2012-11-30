@@ -8,19 +8,20 @@ import android.graphics.Color;
 import android.graphics.Rect;
 
 import pac.man.util.Vector;
-import pac.man.gfx.Animation;
+import pac.man.util.Animation;
+import pac.man.ctrl.MovementAlgorithm;
 
 public class Character {
 
     public static enum AnimationType {
-        IDLE, RIGHT, UP, LEFT, DOWN, DEATH
+        IDLE, RIGHT, UP, LEFT, DOWN, DEATH, SPECIAL
     }
 
     protected Rect boundingRect;
     protected Vector size;
     protected Vector position;
     protected Vector speed = new Vector(0, 0);
-
+    protected MovementAlgorithm movementAlgorithm;
     protected boolean alive = true;
 
     private Map<AnimationType, Animation> animations;
@@ -116,7 +117,72 @@ public class Character {
         }
     }
 
+    public void setActiveAnimation() {
+        // Since the coordinate system looks like this:
+        //
+        // +----------------+-----------> X
+        // |                |
+        // |                |
+        // |                |
+        // +--------------(ಠ_ಠ) <--- PacMan
+        // |
+        // v
+        // Y
+        //
+        // ...we need to reverse the y coordinate when computing the angle.
+        // We also add 360 degrees to eliminate negative values not to produce IndexOutOfBoundsException.
+
+        long angle = 360L + Math.round(Math.toDegrees(Math.atan2(-speed.y, speed.x)));
+
+        // Now our direction field looks like this:
+        //
+        //         |
+        //         |   ^
+        //    <-   |   |
+        //         |
+        //  -------+--------
+        //         |
+        //     |   |   ->
+        //     v   |
+        //         |
+        //
+        // ...but we want it to look like this:
+        //
+        //    \   ^   /
+        //     \  |  /
+        //      \   /
+        //       \ /
+        //  <-    X    ->
+        //       / \
+        //      /   \
+        //     /  |  \
+        //    /   v   \
+        //
+        // ...so we add extra 45 degrees to the angle rotating the coordinate system.
+
+        int index = 1 + (int) (((angle + 45) % 360) / 90);
+
+        // XXX: niezbyt ładne, ale skuteczne ; )
+        AnimationType animationType = null;
+        switch (index) {
+            case 1: animationType = AnimationType.RIGHT; break;
+            case 2: animationType = AnimationType.UP; break;
+            case 3: animationType = AnimationType.LEFT; break;
+            case 4: animationType = AnimationType.DOWN; break;
+        }
+        setActiveAnimation(animationType);
+    }
+
     public Rect getBoundingRect() {
         return boundingRect;
+    }
+
+
+    public MovementAlgorithm getMovementAlgorithm() {
+        return movementAlgorithm;
+    }
+
+    public void setMovementAlgorithm(MovementAlgorithm a) {
+        movementAlgorithm = a;
     }
 }

@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 import pac.man.util.Vector;
+import pac.man.ctrl.CollisionHandler;
+import pac.man.ctrl.StickyCollisions;
 
 public class Level {
     public static final int WALL         = 0x000000;
@@ -26,6 +28,7 @@ public class Level {
     private ArrayList<Rect> enemySpawns;
     private ArrayList<Rect> playerSpawns;
 
+    private CollisionHandler collisionHandler;
     private Random random = new Random();
 
     public Level(Bitmap layout, int displayW, int displayH) {
@@ -41,7 +44,7 @@ public class Level {
         for(int i = 0; i < height; ++i) {
             for(int j = 0; j < width; ++j) {
                 Rect r = new Rect(j*blockSize, i*blockSize,
-                                    (j+1)*blockSize, (i+1)*blockSize);
+                                  (j+1)*blockSize, (i+1)*blockSize);
 
                 int pixel = layout.getPixel(j, i) & 0x00ffffff;
 
@@ -56,6 +59,9 @@ public class Level {
                 }
             }
         }
+
+        // Defaults to sticky collisions.
+        collisionHandler = new StickyCollisions();
     }
 
     public void update(long dt, Canvas canvas, Character c) {
@@ -65,17 +71,8 @@ public class Level {
 
         for(Rect b : blocks) {
             if(Rect.intersects(p, b)) {
-                Vector speed = c.getSpeed();
-                speed.scale(-1.0);
-
-                c.setSpeed(speed);
-
-                do {
-                    c.update(dt, canvas); // reverse for a while
-                    p = c.getBoundingRect();
-                } while(Rect.intersects(p, b));
-
-                c.setSpeed(Vector.ZERO);
+                collisionHandler.handle(dt, canvas, b, c);
+                c.setActiveAnimation();
                 break;
             }
         }
@@ -117,5 +114,13 @@ public class Level {
 
         if(s != 0) return enemySpawns.get(random.nextInt(s));
         else       return null;
+    }
+
+    public CollisionHandler getCollisionHandler() {
+        return collisionHandler;
+    }
+
+    public void setCollisionHandler(CollisionHandler c) {
+        collisionHandler = c;
     }
 }

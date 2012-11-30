@@ -3,24 +3,30 @@ package pac.man;
 import java.util.EnumMap;
 import java.util.Map;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Rect;
+
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+import android.content.Context;
+
 import pac.man.SoundManager.Sound;
-import pac.man.gfx.Animation;
+import pac.man.util.Vector;
+import pac.man.util.Animation;
+
 import pac.man.model.Character;
 import pac.man.model.Character.AnimationType;
 import pac.man.model.Level;
 import pac.man.model.Player;
 import pac.man.model.Ghost;
-import pac.man.model.Strict4WayMovement;
-import pac.man.model.SimpleChaseStrategy;
-import pac.man.util.Vector;
-import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+
+import pac.man.ctrl.Strict4WayMovement;
+import pac.man.ctrl.SimpleChaseStrategy;
+import pac.man.ctrl.BouncyCollisions;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     MainThread thread;
@@ -48,6 +54,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         // TODO Implement relevant factories to do this crap here.
 
         level = resMgr.getLevel(R.raw.test_level);
+        level.setCollisionHandler(new BouncyCollisions());
 
         Map<Character.AnimationType, Animation> animations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);

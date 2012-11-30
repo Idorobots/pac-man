@@ -1,4 +1,4 @@
-package pac.man.model;
+package pac.man.ctrl;
 
 import pac.man.util.Vector;
 

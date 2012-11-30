@@ -14,18 +14,18 @@ public class SoundManager {
     public static enum Sound {
         SAMPLE1
     }
-    
-    private static Context context; 
-    
+
+    private static Context context;
+
     // Dźwięki.
     private static SoundPool soundPool;
     private static Map<Sound, Integer> sounds = new EnumMap<Sound, Integer>(Sound.class);
     private static boolean loaded = false;
-    
+
     private SoundManager() {
         context = null;
     }
-    
+
     public static void init(Context _context) {
         context = _context;
         loadAll();
@@ -44,7 +44,7 @@ public class SoundManager {
         });
         sounds.put(Sound.SAMPLE1, soundPool.load(context, R.raw.sound, 1));
     }
-    
+
     public static void play(Sound sound) {
         // Getting the user sound settings
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
