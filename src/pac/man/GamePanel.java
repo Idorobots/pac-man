@@ -9,7 +9,9 @@ import pac.man.model.Character;
 import pac.man.model.Character.AnimationType;
 import pac.man.model.Level;
 import pac.man.model.Player;
+import pac.man.model.Ghost;
 import pac.man.model.Strict4WayMovement;
+import pac.man.model.SimpleChaseStrategy;
 import pac.man.util.Vector;
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -22,8 +24,11 @@ import android.view.SurfaceView;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     MainThread thread;
+    ResourceManager resMgr;
     Player player;
     Level level;
+    Ghost ghost;
+    long counter = 0;
 
     boolean initalized = false;
 
@@ -31,6 +36,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
+
+        resMgr = new ResourceManager(this);
 
         thread = new MainThread(getHolder(), this);
         thread.start();
@@ -40,46 +47,40 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         initalized = true;
         // TODO Implement relevant factories to do this crap here.
 
-        level = new Level(BitmapFactory.decodeResource(getResources(), R.raw.test_level), getWidth(), getHeight());
+        level = resMgr.getLevel(R.raw.test_level);
 
-        Map<Character.AnimationType, Animation> animations = new EnumMap<Character.AnimationType, Animation>(
-                Character.AnimationType.class);
+        Map<Character.AnimationType, Animation> animations
+            = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
+        Map<Character.AnimationType, Animation> ghostAnimations
+            = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
 
-        animations.put(AnimationType.IDLE, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.idle),
-                1, 1000));
 
-//        animations.put(AnimationType.RIGHT,
-//                new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.right), 4, 500));
-//        animations.put(AnimationType.UP, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.up), 4,
-//                500));
-//        animations.put(AnimationType.LEFT, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.left),
-//                4, 500));
-//        animations.put(AnimationType.DOWN, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.down),
-//                4, 500));
+        // Player animootions.
+        animations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.idle, 1, 1000));
+        animations.put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.right, 4, 500));
+        animations.put(AnimationType.UP, resMgr.getAnimation(R.drawable.up, 4, 500));
+        animations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.left, 4, 500));
+        animations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.down, 4, 500));
+        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.idle, 1, 1000));
 
-        // Test animacji duszka.
-        animations.put(AnimationType.RIGHT,
-                new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_right), 2, 500));
-        animations.put(AnimationType.UP, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_up), 2,
-                500));
-        animations.put(AnimationType.LEFT, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_left),
-                2, 500));
-        animations.put(AnimationType.DOWN, new Animation(BitmapFactory.decodeResource(getResources(), R.drawable.red_down),
-                2, 500));
+        // Ghost animutions
+        ghostAnimations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 1000));
+        ghostAnimations.put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.red_right, 2, 500));
+        ghostAnimations.put(AnimationType.UP, resMgr.getAnimation(R.drawable.red_up, 2, 500));
+        ghostAnimations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.red_down, 2, 500));
+        ghostAnimations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.red_left, 2, 500));
+        ghostAnimations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        ghostAnimations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        animations.put(AnimationType.DEATH, new Animation(
-                BitmapFactory.decodeResource(getResources(), R.drawable.idle), 1, 1000));
-
+        Rect g = level.randomEnemySpawn();
         Rect r = level.randomPlayerSpawn();
-        Vector pos;
 
-        if (r == null)
-            pos = new Vector(getWidth() / 2, getHeight() / 2);
-        else
-            pos = new Vector(r.left, r.top);
-
-        player = new Player(pos, animations);
+        player = new Player(new Vector(r.left, r.top), animations);
         player.setMovementAlgorithm(new Strict4WayMovement());
+
+        ghost = new Ghost(new Vector(g.left, g.top), ghostAnimations);
+        ghost.setMovementAlgorithm(new Strict4WayMovement());
+        ghost.setMovementStrategy(new SimpleChaseStrategy(player, 100.0));
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -142,14 +143,21 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawColor(Color.BLACK);
 
         level.draw(canvas);
+        ghost.draw(canvas);
         player.draw(canvas);
     }
 
     public void update(long dt, Canvas canvas) {
         player.update(dt, canvas);
+
+        if((counter % 15) == 0) {
+            ghost.handleMove();
+        }
+        counter++;
+        ghost.update(dt, canvas);
+
         level.update(dt, canvas, player);
-        // NOTE Since level gets to modify player it should be updated _after_
-        // the player.
+        level.update(dt, canvas, ghost);
     }
 
     public void restartLevel() {
