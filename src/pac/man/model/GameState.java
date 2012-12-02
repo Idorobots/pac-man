@@ -29,7 +29,7 @@ public class GameState {
     public static final int GHOST_VALUE = 100;
     public static final int POWERUP_DURATION = 3000;
     public static final int POWERUP_THRESHOLD = 750;
-    public static final int GHOST_MOVE_INTERVAL = 250;
+    public static final int GHOST_MOVE_INTERVAL = 175;
 
     private boolean running = true;
     private int numOpponents = 4;
@@ -69,17 +69,19 @@ public class GameState {
         Rect p = player.getBoundingRect();
         boolean special = player.isSpecial();
 
-        for(Ghost ghost : ghosts) {
-            if(!ghost.isAlive()) continue;
+        int len = Math.min(ghosts.length, numOpponents);
 
-            Rect g = ghost.getBoundingRect();
+        for(int i = 0; i < len; ++i) {
+            if(!ghosts[i].isAlive()) continue;
+
+            Rect g = ghosts[i].getBoundingRect();
 
             if(Rect.intersects(p, g)) {
                 if(special) {
-                    ghost.setAlive(false);
-                    ghost.setSpeed(new Vector(0, 0));
-                    ghost.setMovementStrategy(new RandomStrategy());
-                    ghost.setMovementAlgorithm(new Strict4WayMovement(0.5)); // Slow the ghost down.
+                    ghosts[i].setAlive(false);
+                    ghosts[i].setSpeed(new Vector(0, 0));
+                    ghosts[i].setMovementStrategy(new RandomStrategy());
+                    ghosts[i].setMovementAlgorithm(new Strict4WayMovement(0.5)); // Slow the ghost down.
                     score += GHOST_VALUE;
                 }
                 else {
@@ -106,8 +108,8 @@ public class GameState {
         }
 
         // End game logic:
-        for(Ghost ghost : ghosts) {
-            if(ghost.isAlive()) return;
+        for(int i = 0; i < len; ++i) {
+            if(ghosts[i].isAlive()) return;
         }
 
         running = false;

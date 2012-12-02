@@ -114,7 +114,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.get(3).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
         ghosts.get(3).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        player = new Player(new Vector(-100,0), animations);
+        player = new Player(new Vector(-200,0), animations);
         gameState = new GameState(player, levels[levelCounter], ghosts);
 
         gameState.setNumOpponents(PacMan.pNOps);
