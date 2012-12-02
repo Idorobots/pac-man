@@ -8,6 +8,7 @@ import android.graphics.Rect;
 
 import pac.man.ctrl.MovementAlgorithm;
 import pac.man.ctrl.Strict4WayMovement;
+import pac.man.ctrl.InertialMovement;
 import pac.man.ctrl.NonrestrictiveMovement;
 import pac.man.ctrl.MovementStrategy;
 import pac.man.ctrl.SimpleChaseStrategy;
@@ -194,7 +195,8 @@ public class GameState {
     private void setPowerupMode() {
         normalMode = false;
 
-        player.setMovementAlgorithm(new NonrestrictiveMovement());
+        //player.setMovementAlgorithm(new NonrestrictiveMovement());
+        player.setMovementAlgorithm(new InertialMovement(player.getSpeed(), 23.0));
         player.setSpecial(true);
 
         for(Ghost ghost : ghosts) {

@@ -3,7 +3,7 @@ package pac.man.ctrl;
 import pac.man.util.Vector;
 
 public class NonrestrictiveMovement extends MovementAlgorithm {
-    double factor = 1.0;
+    private double factor = 1.0;
 
     public NonrestrictiveMovement(double factor) {
         this.factor = factor;
