@@ -4,8 +4,10 @@ import pac.man.util.Vector;
 
 public class Strict4WayMovement extends MovementAlgorithm {
     private Vector[] speeds;
+    private double factor = 1.0;
 
-    public Strict4WayMovement() {
+    public Strict4WayMovement(double factor) {
+        this.factor = factor;
         speeds = new Vector[4];
 
         // Speeds:
@@ -20,6 +22,10 @@ public class Strict4WayMovement extends MovementAlgorithm {
         speeds[3] = new Vector(0.0, 1.0);
     }
 
+    public Strict4WayMovement() {
+        this(1.0);
+    }
+
     public Vector computeSpeed(Vector position, Vector currentSpeed, Vector preferredDir) {
 
         // Similar to Player.handleMove() logic. It's documented there.
@@ -27,6 +33,6 @@ public class Strict4WayMovement extends MovementAlgorithm {
         long index = ((angle + 45) % 360) / 90;
 
         Vector vec = new Vector(speeds[(int) index]);
-        return vec.scale(MovementAlgorithm.getSpeed().getGain());
+        return vec.scale(factor * MovementAlgorithm.getSpeed().getGain());
     }
 }

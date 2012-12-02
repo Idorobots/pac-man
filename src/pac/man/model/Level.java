@@ -9,16 +9,21 @@ import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
+import pac.man.util.Animation;
 import pac.man.util.Vector;
 import pac.man.ctrl.CollisionHandler;
 import pac.man.ctrl.StickyCollisions;
 
+
+// TODO Random level generator.
 public class Level {
+    public static final long AWFUL_HAX   = 23;
+
     public static final int WALL         = 0x000000;
     public static final int ENEMY_SPAWN  = 0xff0000;
     public static final int PLAYER_SPAWN = 0x00ff00;
     public static final int POWER_SPAWN  = 0x0000ff;
-    public static final int GOLD_SPAWN   = 0xffffff;
+    public static final int GOLD_SPAWN   = 0xffff00;
 
     public interface CollisionCallback {
         public boolean onWall(Character who);
@@ -34,14 +39,21 @@ public class Level {
     private ArrayList<Rect> enemySpawns;
     private ArrayList<Rect> playerSpawns;
     private ArrayList<Rect> powerSpawns;
+    private ArrayList<Rect> goldSpawns;
+
+    private Animation gold;
+    private Animation powerup;
 
     private CollisionHandler collisionHandler;
     private CollisionCallback collisionCallback = null;
 
     private Random random = new Random();
 
-    public Level(Bitmap layout, int displayW, int displayH) {
+    public Level(Animation gold, Animation powerup, Bitmap layout, int displayW, int displayH) {
         // TODO Rect merging.
+
+        this.powerup = powerup;
+        this.gold = gold;
 
         width = layout.getWidth();
         height = layout.getHeight();
@@ -52,6 +64,13 @@ public class Level {
         playerSpawns = new ArrayList<Rect>();
         enemySpawns = new ArrayList<Rect>();
         powerSpawns = new ArrayList<Rect>();
+        goldSpawns = new ArrayList<Rect>();
+
+        int goldW = gold.getWidth();
+        int goldH = gold.getHeight();
+
+        int powerW = powerup.getWidth();
+        int powerH = powerup.getHeight();
 
         for(int i = 0; i < height; ++i) {
             for(int j = 0; j < width; ++j) {
@@ -61,13 +80,25 @@ public class Level {
                 int pixel = layout.getPixel(j, i) & 0x00ffffff;
 
                 switch(pixel) {
-                    case WALL:         blocks.add(r); break;
-                    case ENEMY_SPAWN:  enemySpawns.add(r); break;
-                    case PLAYER_SPAWN: playerSpawns.add(r); break;
-                    case POWER_SPAWN:  powerSpawns.add(r); break;
-                    case GOLD_SPAWN:   break; // TODO
+                    case WALL:
+                        blocks.add(r);
+                    break;
+                    case ENEMY_SPAWN:
+                        enemySpawns.add(r);
+                    break;
+                    case PLAYER_SPAWN:
+                        playerSpawns.add(r);
+                    break;
+                    case POWER_SPAWN:
+                        powerSpawns.add(new Rect(r.left, r.top,
+                                                 r.left + powerW, r.top + powerH));
+                    break;
+                    case GOLD_SPAWN:
+                        goldSpawns.add(new Rect(r.left, r.top,
+                                                r.left + goldH, r.top + goldH));
+                    break;
 
-                    default: System.out.println(String.format("Bad level data: %x", pixel));
+                    default: break;
                 }
             }
         }
@@ -77,6 +108,10 @@ public class Level {
     }
 
     public void update(long dt, Canvas canvas, Character c) {
+        // Update animations:
+        powerup.update(dt);
+        gold.update(dt);
+
         if(!c.isMoving()) return; // No need to do anything.
 
         Rect p = c.getBoundingRect();
@@ -86,7 +121,9 @@ public class Level {
                 collisionHandler.handle(dt, canvas, b, c);
 
                 if(collisionCallback != null) {
-                    collisionCallback.onWall(c);
+                    if(collisionCallback.onWall(c)) {
+                        blocks.remove(b);
+                    }
                 }
                 break;
             }
@@ -103,17 +140,16 @@ public class Level {
             }
         }
 
-        // TODO
-        // for(Rect b : powerSpawns) {
-        //     if(Rect.intersects(p, b)) {
-        //         if(collisionCallback != null) {
-        //             if(collisionCallback.onGold(c)) {
-        //                 goldSpawns.remove(b);
-        //             }
-        //         }
-        //         break;
-        //     }
-        // }
+        for(Rect b : goldSpawns) {
+            if(Rect.intersects(p, b)) {
+                if(collisionCallback != null) {
+                    if(collisionCallback.onGold(c)) {
+                        goldSpawns.remove(b);
+                    }
+                }
+                break;
+            }
+        }
     }
 
     public void draw(Canvas canvas) {
@@ -125,22 +161,13 @@ public class Level {
             canvas.drawRect(r, p);
         }
 
-        // NOTE Just for debugging purposes.
-        // TODO Remove
-
-        p.setColor(Color.GREEN);
-        for(Rect r : playerSpawns) {
-            canvas.drawRect(r, p);
-        }
-
-        p.setColor(Color.RED);
-        for(Rect r : enemySpawns) {
-            canvas.drawRect(r, p);
-        }
-
-        p.setColor(Color.YELLOW);
         for(Rect r : powerSpawns) {
-            canvas.drawRect(r, p);
+            powerup.draw(r, canvas);
+            powerup.update(AWFUL_HAX); // Fake independant animations.
+        }
+
+        for(Rect r : goldSpawns) {
+            gold.draw(r, canvas);
         }
     }
 
@@ -176,5 +203,9 @@ public class Level {
         collisionCallback = cc;
     }
 
-    // TODO Random level generator.
+    public int getTotalGold() {
+        int totalGold = goldSpawns.size();
+        int totalPower = powerSpawns.size();
+        return totalGold + totalPower;
+    }
 }

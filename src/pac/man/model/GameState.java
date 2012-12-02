@@ -78,6 +78,7 @@ public class GameState {
                     ghost.setAlive(false);
                     ghost.setSpeed(new Vector(0, 0));
                     ghost.setMovementStrategy(new RandomStrategy());
+                    ghost.setMovementAlgorithm(new Strict4WayMovement(0.5)); // Slow the ghost down.
                     score += GHOST_VALUE;
                 }
                 else {
@@ -98,9 +99,12 @@ public class GameState {
             }
         }
 
-        // End game logic:
-        // TODO Additional end game state - no gold on the level.
+        if(level.getTotalGold() == 0) {
+            running = false;
+            return;
+        }
 
+        // End game logic:
         for(Ghost ghost : ghosts) {
             if(ghost.isAlive()) return;
         }
@@ -177,6 +181,8 @@ public class GameState {
         player.setSpecial(false);
 
         for(Ghost ghost : ghosts) {
+            if(!ghost.isAlive()) continue;
+
             ghost.setMovementAlgorithm(new Strict4WayMovement());
             ghost.setMovementStrategy(new SimpleChaseStrategy(player, 150.0, 1.0));
             ghost.setSpecial(false);
@@ -209,8 +215,12 @@ public class GameState {
         normalMode = true;
         lives = STARTING_LIVES;
 
+        player.setSpeed(new Vector(0, 0));
+
         level.setCollisionCallback(new CollisionCallback() {
-            public boolean onWall(Character who) { /* Do nothing. */ return false; }
+            public boolean onWall(Character who) {
+                return false;
+            }
             public boolean onPowerup(Character who) {
                 if(who == player) {
                     setPowerupMode();

@@ -73,16 +73,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
 
         // Player animootions.
-        animations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.idle, 1, 1000));
+        animations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.idle, 1, 10000));
         animations.put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.right, 4, 500));
         animations.put(AnimationType.UP, resMgr.getAnimation(R.drawable.up, 4, 500));
         animations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.left, 4, 500));
         animations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.down, 4, 500));
-        animations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.idle, 1, 1000));
-        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        animations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.boing, 2, 500));
+        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.death, 13, 1300));
 
         // Ghost animutions
-        ghosts.get(0).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 1000));
+        ghosts.get(0).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 500));
         ghosts.get(0).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.red_right, 2, 500));
         ghosts.get(0).put(AnimationType.UP, resMgr.getAnimation(R.drawable.red_up, 2, 500));
         ghosts.get(0).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.red_down, 2, 500));
@@ -90,7 +90,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.get(0).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
         ghosts.get(0).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        ghosts.get(1).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.green_down, 2, 1000));
+        ghosts.get(1).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.green_down, 2, 500));
         ghosts.get(1).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.green_right, 2, 500));
         ghosts.get(1).put(AnimationType.UP, resMgr.getAnimation(R.drawable.green_up, 2, 500));
         ghosts.get(1).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.green_down, 2, 500));
@@ -98,7 +98,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.get(1).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
         ghosts.get(1).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        ghosts.get(2).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.blue_down, 2, 1000));
+        ghosts.get(2).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.blue_down, 2, 500));
         ghosts.get(2).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.blue_right, 2, 500));
         ghosts.get(2).put(AnimationType.UP, resMgr.getAnimation(R.drawable.blue_up, 2, 500));
         ghosts.get(2).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.blue_down, 2, 500));
@@ -106,7 +106,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.get(2).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
         ghosts.get(2).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        ghosts.get(3).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.orange_down, 2, 1000));
+        ghosts.get(3).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.orange_down, 2, 500));
         ghosts.get(3).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.orange_right, 2, 500));
         ghosts.get(3).put(AnimationType.UP, resMgr.getAnimation(R.drawable.orange_up, 2, 500));
         ghosts.get(3).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.orange_down, 2, 500));

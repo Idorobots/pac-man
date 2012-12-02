@@ -32,6 +32,8 @@ public class Player extends Character {
     }
 
     public void handleMove(Vector direction) {
+        if(!isAlive()) return;
+
         setSpeed(movementAlgorithm.computeSpeed(getPosition(), getSpeed(), direction));
     }
 }

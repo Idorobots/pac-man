@@ -37,7 +37,9 @@ public class ResourceManager {
     }
 
     public Level getLevel(int id) {
-        return new Level(BitmapFactory.decodeResource(view.getResources(), id),
+        return new Level(getAnimation(R.drawable.gold, 2, 1000),
+                         getAnimation(R.drawable.cherry, 2, 2000),
+                         BitmapFactory.decodeResource(view.getResources(), id),
                          view.getWidth(), view.getHeight());
     }
 
