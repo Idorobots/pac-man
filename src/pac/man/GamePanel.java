@@ -117,6 +117,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         player = new Player(new Vector(-100,0), animations);
         gameState = new GameState(player, levels[levelCounter], ghosts);
 
+        gameState.setNumOpponents(PacMan.pNOps);
+        
         initalized = true;
     }
 
@@ -201,28 +203,20 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         if(gameState.playerWon()) {
             levelCounter = (levelCounter + 1) % levels.length;
-            showMessage(String.format("Level %d", levelCounter + 1));
+            PacMan.showMessage(String.format("Level %d", levelCounter + 1));
 
             gameState.setLevel(levels[levelCounter]);
-        }
-        else {
-            showMessage("Game over...");
         }
     }
 
     public void restartLevel() {
         thread.setRunning(false);
 
-        showMessage("Level restarted.");
+        PacMan.showMessage("Level restarted.");
         gameState.restartLevel();
 
         thread.setRunning(true);
         redraw();
         thread.setRunning(false);
-    }
-
-    public void showMessage(String str) {
-        // FIXME Crashes the game.
-        // Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
     }
 }

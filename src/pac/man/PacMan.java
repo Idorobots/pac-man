@@ -30,6 +30,7 @@ import pac.man.util.Vector;
 
 public class PacMan extends Activity implements SensorEventListener {
 
+    private static PacMan instance; 
     private GamePanel gamePanel = null;
 
     // Accelerometer
@@ -37,6 +38,9 @@ public class PacMan extends Activity implements SensorEventListener {
     private boolean mInitialized;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    
+    public static Speed pSpeed = null;
+    public static int pNOps = -1;
 
     private void getPrefs() {
         // TODO: powiązanie parametrów menu z parametrami gry
@@ -46,10 +50,13 @@ public class PacMan extends Activity implements SensorEventListener {
 
         for (Speed s : Speed.values()) {
             if (s.getLabel().equals(speedPreference)) {
+                pSpeed = s;
                 MovementAlgorithm.setSpeed(s);
                 System.out.println(s.getGain());
             }
         }
+        
+        pNOps = Integer.parseInt(nOpponentsPreference);
 
         if (gamePanel != null && gamePanel.player != null) {
             Player p = gamePanel.player;
@@ -126,6 +133,8 @@ public class PacMan extends Activity implements SensorEventListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
+        
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         gamePanel = new GamePanel(this);
@@ -138,6 +147,10 @@ public class PacMan extends Activity implements SensorEventListener {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+    
+    public static PacMan getInstance() {
+        return instance;
     }
 
     // @Override
@@ -213,4 +226,15 @@ public class PacMan extends Activity implements SensorEventListener {
 
         return super.onKeyUp(keyCode, event);
     }
+    
+    public static void showMessage(final String str) {
+        // FIXME Crashes the game.
+        getInstance().runOnUiThread(new Runnable() {
+            public void run() {
+              Toast.makeText(getInstance(), str, Toast.LENGTH_SHORT).show();
+            }
+          });
+        
+//         Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+    }    
 }
