@@ -17,6 +17,6 @@ public class StickyCollisions extends CollisionHandler {
             b = c.getBoundingRect();
         } while(Rect.intersects(b, rect));
 
-        c.setSpeed(Vector.ZERO);
+        c.setSpeed(new Vector(0, 0));
     }
 }

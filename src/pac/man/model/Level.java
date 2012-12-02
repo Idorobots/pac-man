@@ -20,6 +20,12 @@ public class Level {
     public static final int POWER_SPAWN  = 0x0000ff;
     public static final int GOLD_SPAWN   = 0xffffff;
 
+    public interface CollisionCallback {
+        public boolean onWall(Character who);
+        public boolean onGold(Character who);
+        public boolean onPowerup(Character who);
+    }
+
     private int blockSize = 14;
     private int height = 0;
     private int width = 0;
@@ -30,6 +36,8 @@ public class Level {
     private ArrayList<Rect> powerSpawns;
 
     private CollisionHandler collisionHandler;
+    private CollisionCallback collisionCallback = null;
+
     private Random random = new Random();
 
     public Level(Bitmap layout, int displayW, int displayH) {
@@ -76,10 +84,36 @@ public class Level {
         for(Rect b : blocks) {
             if(Rect.intersects(p, b)) {
                 collisionHandler.handle(dt, canvas, b, c);
-                c.setActiveAnimation();
+
+                if(collisionCallback != null) {
+                    collisionCallback.onWall(c);
+                }
                 break;
             }
         }
+
+        for(Rect b : powerSpawns) {
+            if(Rect.intersects(p, b)) {
+                if(collisionCallback != null) {
+                    if(collisionCallback.onPowerup(c)) {
+                        powerSpawns.remove(b);
+                    }
+                }
+                break;
+            }
+        }
+
+        // TODO
+        // for(Rect b : powerSpawns) {
+        //     if(Rect.intersects(p, b)) {
+        //         if(collisionCallback != null) {
+        //             if(collisionCallback.onGold(c)) {
+        //                 goldSpawns.remove(b);
+        //             }
+        //         }
+        //         break;
+        //     }
+        // }
     }
 
     public void draw(Canvas canvas) {
@@ -110,18 +144,24 @@ public class Level {
         }
     }
 
-    public Rect randomPlayerSpawn() {
+    public Vector randomPlayerSpawn() {
         int s = playerSpawns.size();
+        Rect r;
 
-        if(s != 0) return playerSpawns.get(random.nextInt(s));
-        else       return null;
+        if(s != 0) r = playerSpawns.get(random.nextInt(s));
+        else       return new Vector(0, 0);
+
+        return new Vector(r.left, r.top);
     }
 
-    public Rect randomEnemySpawn() {
+    public Vector randomEnemySpawn() {
         int s = enemySpawns.size();
+        Rect r;
 
-        if(s != 0) return enemySpawns.get(random.nextInt(s));
-        else       return null;
+        if(s != 0) r = enemySpawns.get(random.nextInt(s));
+        else       return new Vector(0, 0);
+
+        return new Vector(r.left, r.top);
     }
 
     public CollisionHandler getCollisionHandler() {
@@ -131,4 +171,10 @@ public class Level {
     public void setCollisionHandler(CollisionHandler c) {
         collisionHandler = c;
     }
+
+    public void setCollisionCallback(CollisionCallback cc) {
+        collisionCallback = cc;
+    }
+
+    // TODO Random level generator.
 }

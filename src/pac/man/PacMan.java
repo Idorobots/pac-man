@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import pac.man.ctrl.MovementAlgorithm;
 import pac.man.ctrl.MovementAlgorithm.Speed;
+import pac.man.model.GameState;
 import pac.man.model.Player;
 import pac.man.util.Vector;
 
@@ -54,6 +55,13 @@ public class PacMan extends Activity implements SensorEventListener {
             Player p = gamePanel.player;
             Vector speed = new Vector(p.getSpeed().normalize().scale(MovementAlgorithm.getSpeed().getGain()));
             p.setSpeed(speed);
+        }
+
+        if (gamePanel != null && gamePanel.gameState != null) {
+            // FIXME Doesn't work.
+            GameState g = gamePanel.gameState;
+            g.setNumOpponents(Integer.parseInt(nOpponentsPreference));
+            System.out.println("Num Opponents: " + nOpponentsPreference);
         }
     }
 

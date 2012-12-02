@@ -41,22 +41,6 @@ public class Ghost extends Character {
         Vector spd = movementAlgorithm.computeSpeed(getPosition(), getSpeed(), dir);
 
         setSpeed(spd);
-
-        setActiveAnimation();
-    }
-
-    public void update(long dt, Canvas canvas) {
-        super.update(dt, canvas);
-
-        if(isSpecial()) {
-            setActiveAnimation(AnimationType.SPECIAL);
-        }
-        else if(!isAlive()) {
-            setActiveAnimation(AnimationType.DEATH);
-        }
-        else if(!isMoving()) {
-            setActiveAnimation(AnimationType.IDLE);
-        }
     }
 
     public boolean isSpecial() {

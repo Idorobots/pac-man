@@ -1,5 +1,6 @@
 package pac.man;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -7,41 +8,42 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.Paint;
 
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import pac.man.util.Vector;
 import pac.man.util.Animation;
 
+import pac.man.model.GameState;
 import pac.man.model.Character;
 import pac.man.model.Character.AnimationType;
 import pac.man.model.Level;
 import pac.man.model.Player;
-import pac.man.model.Ghost;
-
-import pac.man.ctrl.Strict4WayMovement;
-import pac.man.ctrl.SimpleChaseStrategy;
-import pac.man.ctrl.BouncyCollisions;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
+    Context context;
     MainThread thread;
     ResourceManager resMgr;
-
-    Player player;
-    Level level;
-    Ghost ghost;
-    long counter = 0;
-
     boolean initalized = false;
+
+    private int levelCounter = 0;
+    Level[] levels;
+
+    GameState gameState;
+    Player player;
 
     public GamePanel(Context context) {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
+
+        this.context = context;
 
         resMgr = new ResourceManager(this, context);
 
@@ -50,17 +52,25 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void init() {
-        initalized = true;
+        // Levels
+        levels = new Level[2];
+        levels[0] = resMgr.getLevel(R.raw.test_level);
+        levels[1] = resMgr.getLevel(R.raw.test_level2);
 
+        // Sounds
         resMgr.loadSound(R.raw.sound);
 
-        level = resMgr.getLevel(R.raw.test_level2);
-        level.setCollisionHandler(new BouncyCollisions());
-
+        // Animations
         Map<Character.AnimationType, Animation> animations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
-        Map<Character.AnimationType, Animation> ghostAnimations
-            = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
+
+        // FIXME Shit, this is ugly...
+        ArrayList<Map<Character.AnimationType, Animation>> ghosts
+            = new ArrayList<Map<Character.AnimationType, Animation>>();
+        ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
+        ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
+        ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
+        ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
 
         // Player animootions.
         animations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.idle, 1, 1000));
@@ -68,26 +78,46 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         animations.put(AnimationType.UP, resMgr.getAnimation(R.drawable.up, 4, 500));
         animations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.left, 4, 500));
         animations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.down, 4, 500));
-        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.idle, 1, 1000));
+        animations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.idle, 1, 1000));
+        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
 
         // Ghost animutions
-        ghostAnimations.put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 1000));
-        ghostAnimations.put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.red_right, 2, 500));
-        ghostAnimations.put(AnimationType.UP, resMgr.getAnimation(R.drawable.red_up, 2, 500));
-        ghostAnimations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.red_down, 2, 500));
-        ghostAnimations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.red_left, 2, 500));
-        ghostAnimations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
-        ghostAnimations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
+        ghosts.get(0).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 1000));
+        ghosts.get(0).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.red_right, 2, 500));
+        ghosts.get(0).put(AnimationType.UP, resMgr.getAnimation(R.drawable.red_up, 2, 500));
+        ghosts.get(0).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.red_down, 2, 500));
+        ghosts.get(0).put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.red_left, 2, 500));
+        ghosts.get(0).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        ghosts.get(0).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        Rect g = level.randomEnemySpawn();
-        Rect r = level.randomPlayerSpawn();
+        ghosts.get(1).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.green_down, 2, 1000));
+        ghosts.get(1).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.green_right, 2, 500));
+        ghosts.get(1).put(AnimationType.UP, resMgr.getAnimation(R.drawable.green_up, 2, 500));
+        ghosts.get(1).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.green_down, 2, 500));
+        ghosts.get(1).put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.green_left, 2, 500));
+        ghosts.get(1).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        ghosts.get(1).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        player = new Player(new Vector(r.left, r.top), animations);
-        player.setMovementAlgorithm(new Strict4WayMovement());
+        ghosts.get(2).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.blue_down, 2, 1000));
+        ghosts.get(2).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.blue_right, 2, 500));
+        ghosts.get(2).put(AnimationType.UP, resMgr.getAnimation(R.drawable.blue_up, 2, 500));
+        ghosts.get(2).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.blue_down, 2, 500));
+        ghosts.get(2).put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.blue_left, 2, 500));
+        ghosts.get(2).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        ghosts.get(2).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
-        ghost = new Ghost(new Vector(g.left, g.top), ghostAnimations);
-        ghost.setMovementAlgorithm(new Strict4WayMovement());
-        ghost.setMovementStrategy(new SimpleChaseStrategy(player, 100.0, 1.0));
+        ghosts.get(3).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.orange_down, 2, 1000));
+        ghosts.get(3).put(AnimationType.RIGHT, resMgr.getAnimation(R.drawable.orange_right, 2, 500));
+        ghosts.get(3).put(AnimationType.UP, resMgr.getAnimation(R.drawable.orange_up, 2, 500));
+        ghosts.get(3).put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.orange_down, 2, 500));
+        ghosts.get(3).put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.orange_left, 2, 500));
+        ghosts.get(3).put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.ill_white, 2, 500));
+        ghosts.get(3).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
+
+        player = new Player(new Vector(-100,0), animations);
+        gameState = new GameState(player, levels[levelCounter], ghosts);
+
+        initalized = true;
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -96,7 +126,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder holder) {
         if (!initalized) {
             init();
-            // thread.setRunning(true);
+            thread.setRunning(true);
         }
 
         redraw();
@@ -149,39 +179,50 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void draw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
 
-        level.draw(canvas);
-        ghost.draw(canvas);
-        player.draw(canvas);
+        gameState.draw(canvas);
+
+        int score = gameState.getScore();
+        int lives = gameState.getLives();
+
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(22);
+
+        canvas.drawText(String.format("%d", score),
+                        10, getHeight() - 20, paint);
+
+        paint.setColor(Color.MAGENTA);
+        canvas.drawText(String.format("%d", lives),
+                        getWidth() - 20, getHeight() - 20, paint);
     }
 
     public void update(long dt, Canvas canvas) {
-        player.update(dt, canvas);
+        gameState.update(dt, canvas);
 
-        if((counter % 15) == 0) {
-            ghost.handleMove();
+        if(gameState.playerWon()) {
+            levelCounter = (levelCounter + 1) % levels.length;
+            showMessage(String.format("Level %d", levelCounter + 1));
+
+            gameState.setLevel(levels[levelCounter]);
         }
-        counter++;
-        ghost.update(dt, canvas);
-
-        level.update(dt, canvas, player);
-        level.update(dt, canvas, ghost);
+        else {
+            showMessage("Game over...");
+        }
     }
 
     public void restartLevel() {
         thread.setRunning(false);
 
-        Rect r = level.randomPlayerSpawn();
-        Vector pos;
-
-        pos = (r == null) ? new Vector(getWidth() / 2, getHeight() / 2) : new Vector(r.left, r.top);
-
-        player.setPosition(pos);
-        player.setMovementAlgorithm(new Strict4WayMovement());
-        player.setActiveAnimation(AnimationType.IDLE);
-        player.setSpeed(new Vector(0, 0));
+        showMessage("Level restarted.");
+        gameState.restartLevel();
 
         thread.setRunning(true);
         redraw();
         thread.setRunning(false);
+    }
+
+    public void showMessage(String str) {
+        // FIXME Crashes the game.
+        // Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
     }
 }

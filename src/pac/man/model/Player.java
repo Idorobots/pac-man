@@ -33,17 +33,5 @@ public class Player extends Character {
 
     public void handleMove(Vector direction) {
         setSpeed(movementAlgorithm.computeSpeed(getPosition(), getSpeed(), direction));
-        setActiveAnimation();
-    }
-
-    public void update(long dt, Canvas canvas) {
-        super.update(dt, canvas);
-
-        if(!isAlive()) {
-            setActiveAnimation(AnimationType.DEATH);
-        }
-        else if(!isMoving()) {
-            setActiveAnimation(AnimationType.IDLE);
-        }
     }
 }
