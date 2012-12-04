@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import pac.man.R;
+import pac.man.ResourceManager;
 import pac.man.ctrl.MovementAlgorithm;
 import pac.man.ctrl.Strict4WayMovement;
 import pac.man.ctrl.InertialMovement;
@@ -31,6 +33,8 @@ public class GameState {
     public static final int POWERUP_THRESHOLD = 750;
     public static final int GHOST_MOVE_INTERVAL = 175;
 
+    private final ResourceManager resMgr;
+    
     private boolean running = true;
     private int numOpponents = 4;
     private int lives;
@@ -45,7 +49,7 @@ public class GameState {
     private long thresholdCounter = 0;
     private boolean normalMode = true;
 
-    public GameState(Player player, Level level, ArrayList<Map<Character.AnimationType, Animation>> ghosts) {
+    public GameState(Player player, Level level, ArrayList<Map<Character.AnimationType, Animation>> ghosts, ResourceManager resMgr) {
         assert player != null;
         assert level != null;
         assert ghosts.size() >= 1;
@@ -59,6 +63,8 @@ public class GameState {
         for(int i = 0; i < size; ++i) {
             this.ghosts[i] = new Ghost(new Vector(-100, 0), ghosts.get(i));
         }
+        
+        this.resMgr = resMgr;
 
         restartLevel();
     }
@@ -86,6 +92,8 @@ public class GameState {
                 }
                 else {
                     lives--;
+                    resMgr.playSound(R.raw.death);
+                    
 
                     if(lives <= 0) {
                         player.setAlive(false);
@@ -221,6 +229,7 @@ public class GameState {
 
         player.setSpeed(new Vector(0, 0));
 
+        level.init();
         level.setCollisionCallback(new CollisionCallback() {
             public boolean onWall(Character who) {
                 return false;
@@ -229,6 +238,7 @@ public class GameState {
                 if(who == player) {
                     setPowerupMode();
                     score += POWER_VALUE;
+                    resMgr.playSound(R.raw.powerup);
                     return true;
                 }
                 return false;
@@ -236,6 +246,7 @@ public class GameState {
             public boolean onGold(Character who) {
                 if(who == player) {
                     score += GOLD_VALUE;
+                    resMgr.playSound(R.raw.coin);
                     return true;
                 }
                 return false;

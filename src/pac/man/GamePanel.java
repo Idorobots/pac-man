@@ -58,7 +58,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         levels[1] = resMgr.getLevel(R.raw.test_level2);
 
         // Sounds
-        resMgr.loadSound(R.raw.sound);
+        resMgr.loadSound(R.raw.coin);
+        resMgr.loadSound(R.raw.powerup);
+        resMgr.loadSound(R.raw.death);
 
         // Animations
         Map<Character.AnimationType, Animation> animations
@@ -115,7 +117,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ghosts.get(3).put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.ill_blue, 2, 500));
 
         player = new Player(new Vector(-200,0), animations);
-        gameState = new GameState(player, levels[levelCounter], ghosts);
+        gameState = new GameState(player, levels[levelCounter], ghosts, resMgr);
 
         gameState.setNumOpponents(PacMan.pNOps);
         
@@ -218,5 +220,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         thread.setRunning(true);
         redraw();
         thread.setRunning(false);
+    }
+    
+    public ResourceManager getResourceManager() {
+        return resMgr;
     }
 }
