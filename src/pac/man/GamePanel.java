@@ -91,7 +91,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         animations.put(AnimationType.LEFT, resMgr.getAnimation(R.drawable.left, 4, 500));
         animations.put(AnimationType.DOWN, resMgr.getAnimation(R.drawable.down, 4, 500));
         animations.put(AnimationType.SPECIAL, resMgr.getAnimation(R.drawable.boing, 2, 500));
-        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.death, 13, 1300));
+        animations.put(AnimationType.DEATH, resMgr.getAnimation(R.drawable.death, 13, 750));
 
         // Ghost animutions
         ghosts.get(0).put(AnimationType.IDLE, resMgr.getAnimation(R.drawable.red_down, 2, 500));

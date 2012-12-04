@@ -112,8 +112,10 @@ public class GameState {
             }
         }
 
-        if(level.getTotalGold() == 0) {
-            running = false;
+        if(level.getTotalGold() == 0 && normalMode) {
+            //running = false;
+            setPowerupMode();
+            modeCounter = Long.MAX_VALUE; // Infinite powerup mode!
             return;
         }
 
