@@ -34,7 +34,7 @@ public class GameState {
     public static final int GHOST_MOVE_INTERVAL = 175;
 
     private final ResourceManager resMgr;
-    
+
     private boolean running = true;
     private int numOpponents = 4;
     private int lives;
@@ -63,7 +63,7 @@ public class GameState {
         for(int i = 0; i < size; ++i) {
             this.ghosts[i] = new Ghost(new Vector(-100, 0), ghosts.get(i));
         }
-        
+
         this.resMgr = resMgr;
 
         restartLevel();
@@ -89,16 +89,18 @@ public class GameState {
                     ghosts[i].setMovementStrategy(new RandomStrategy());
                     ghosts[i].setMovementAlgorithm(new Strict4WayMovement(0.5)); // Slow the ghost down.
                     score += GHOST_VALUE;
+
+                    resMgr.playSound(R.raw.pacman_eatghost);
                 }
                 else {
                     lives--;
                     resMgr.playSound(R.raw.death);
-                    
 
                     if(lives <= 0) {
                         player.setAlive(false);
                         player.setSpeed(new Vector(0, 0));
                         running = false;
+                        resMgr.playSound(R.raw.pacman_death);
                     }
                     else {
                         // TODO Message indication.
@@ -205,7 +207,6 @@ public class GameState {
     private void setPowerupMode() {
         normalMode = false;
 
-        //player.setMovementAlgorithm(new NonrestrictiveMovement());
         player.setMovementAlgorithm(new InertialMovement(player.getSpeed(), 23.0));
         player.setSpecial(true);
 
@@ -218,6 +219,7 @@ public class GameState {
         level.setCollisionHandler(new BouncyCollisions());
 
         modeCounter = POWERUP_DURATION;
+        resMgr.playSound(R.raw.pacman_intermission);
     }
 
     public void restartLevel() {
@@ -229,16 +231,24 @@ public class GameState {
 
         player.setSpeed(new Vector(0, 0));
 
+        for(Ghost ghost : ghosts) {
+            ghost.setPosition(level.randomEnemySpawn());
+        }
+
         level.init();
         level.setCollisionCallback(new CollisionCallback() {
             public boolean onWall(Character who) {
+                if(who == player && !normalMode) {
+                    resMgr.playSound(R.raw.coin);
+                    return true;
+                }
                 return false;
             }
             public boolean onPowerup(Character who) {
                 if(who == player) {
-                    setPowerupMode();
+                    resMgr.playSound(R.raw.pacman_eatfruit);
                     score += POWER_VALUE;
-                    resMgr.playSound(R.raw.powerup);
+                    setPowerupMode();
                     return true;
                 }
                 return false;
@@ -246,7 +256,7 @@ public class GameState {
             public boolean onGold(Character who) {
                 if(who == player) {
                     score += GOLD_VALUE;
-                    resMgr.playSound(R.raw.coin);
+                    resMgr.playSound(R.raw.pacman_chomp);
                     return true;
                 }
                 return false;
@@ -264,7 +274,6 @@ public class GameState {
         player.setSpecial(false);
 
         for(Ghost ghost : ghosts) {
-            ghost.setPosition(level.randomEnemySpawn());
             ghost.setAlive(true);
             ghost.setSpecial(false);
         }

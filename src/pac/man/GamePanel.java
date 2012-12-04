@@ -53,14 +53,24 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private void init() {
         // Levels
-        levels = new Level[2];
-        levels[0] = resMgr.getLevel(R.raw.test_level);
-        levels[1] = resMgr.getLevel(R.raw.test_level2);
+        levels = new Level[6];
+        levels[0] = resMgr.getLevel(R.raw.level1);
+        levels[1] = resMgr.getLevel(R.raw.level2);
+        levels[2] = resMgr.getLevel(R.raw.level3);
+        levels[3] = resMgr.getLevel(R.raw.level4);
+        levels[4] = resMgr.getLevel(R.raw.test_level);
+        levels[5] = resMgr.getLevel(R.raw.test_level2);
 
         // Sounds
         resMgr.loadSound(R.raw.coin);
         resMgr.loadSound(R.raw.powerup);
         resMgr.loadSound(R.raw.death);
+
+        resMgr.loadSound(R.raw.pacman_death);
+        resMgr.loadSound(R.raw.pacman_chomp);
+        resMgr.loadSound(R.raw.pacman_eatghost);
+        resMgr.loadSound(R.raw.pacman_eatfruit);
+        resMgr.loadSound(R.raw.pacman_intermission);
 
         // Animations
         Map<Character.AnimationType, Animation> animations

@@ -48,7 +48,7 @@ public class Level {
     private CollisionCallback collisionCallback = null;
 
     private Random random = new Random();
-    
+
     Bitmap layout;
     int displayW;
     int displayH;
@@ -62,7 +62,7 @@ public class Level {
         this.layout = layout;
         this.displayW = displayW;
         this.displayH = displayH;
-        
+
         width = layout.getWidth();
         height = layout.getHeight();
 
@@ -73,14 +73,13 @@ public class Level {
         enemySpawns = new ArrayList<Rect>();
         powerSpawns = new ArrayList<Rect>();
         goldSpawns = new ArrayList<Rect>();
-        
-        
+
         init();
-        
+
         // Defaults to sticky collisions.
         collisionHandler = new StickyCollisions();
     }
-    
+
     public void init() {
         blocks.clear();
         playerSpawns.clear();
@@ -123,7 +122,7 @@ public class Level {
                     default: break;
                 }
             }
-        }        
+        }
     }
 
     public void update(long dt, Canvas canvas, Character c) {
@@ -175,7 +174,7 @@ public class Level {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
         p.setStyle(Paint.Style.FILL);
-        
+
         for(Rect r : blocks) {
             canvas.drawRect(r, p);
         }
