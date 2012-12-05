@@ -97,6 +97,7 @@ public class GameState {
                     lives--;
                     resMgr.playSound(R.raw.death);
                     PacMan.showMessage("Life lost");
+
                     if(lives <= 0) {
                         player.setAlive(false);
                         player.setSpeed(new Vector(0, 0));
@@ -233,6 +234,10 @@ public class GameState {
         score = 0;
 
         player.setSpeed(new Vector(0, 0));
+
+        for(Ghost ghost : ghosts) {
+            ghost.setPosition(level.randomEnemySpawn());
+        }
 
         for(Ghost ghost : ghosts) {
             ghost.setPosition(level.randomEnemySpawn());

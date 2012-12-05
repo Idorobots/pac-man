@@ -72,6 +72,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         resMgr.loadSound(R.raw.pacman_eatfruit);
         resMgr.loadSound(R.raw.pacman_intermission);
 
+        resMgr.loadSound(R.raw.pacman_death);
+        resMgr.loadSound(R.raw.pacman_chomp);
+        resMgr.loadSound(R.raw.pacman_eatghost);
+        resMgr.loadSound(R.raw.pacman_eatfruit);
+        resMgr.loadSound(R.raw.pacman_intermission);
+
         // Animations
         Map<Character.AnimationType, Animation> animations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
