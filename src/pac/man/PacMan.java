@@ -43,7 +43,6 @@ public class PacMan extends Activity implements SensorEventListener {
     public static int pNOps = -1;
 
     private void getPrefs() {
-        // TODO: powiązanie parametrów menu z parametrami gry
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String speedPreference = prefs.getString("speedPref", "Normal");
         String nOpponentsPreference = prefs.getString("opponentsPref", "4");
@@ -52,7 +51,6 @@ public class PacMan extends Activity implements SensorEventListener {
             if (s.getLabel().equals(speedPreference)) {
                 pSpeed = s;
                 MovementAlgorithm.setSpeed(s);
-                System.out.println(s.getGain());
             }
         }
         
@@ -62,13 +60,12 @@ public class PacMan extends Activity implements SensorEventListener {
             Player p = gamePanel.player;
             Vector speed = new Vector(p.getSpeed().normalize().scale(MovementAlgorithm.getSpeed().getGain()));
             p.setSpeed(speed);
-        }
 
-        if (gamePanel != null && gamePanel.gameState != null) {
-            // FIXME Doesn't work.
             GameState g = gamePanel.gameState;
+            boolean restart = pNOps != g.getNumOpponents(); 
             g.setNumOpponents(Integer.parseInt(nOpponentsPreference));
-            System.out.println("Num Opponents: " + nOpponentsPreference);
+            if (restart)
+                g.restartLevel();
         }
     }
 
@@ -187,8 +184,6 @@ public class PacMan extends Activity implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -228,13 +223,10 @@ public class PacMan extends Activity implements SensorEventListener {
     }
     
     public static void showMessage(final String str) {
-        // FIXME Crashes the game.
         getInstance().runOnUiThread(new Runnable() {
             public void run() {
               Toast.makeText(getInstance(), str, Toast.LENGTH_SHORT).show();
             }
           });
-        
-//         Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
     }    
 }

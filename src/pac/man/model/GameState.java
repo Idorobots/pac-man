@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import pac.man.PacMan;
 import pac.man.R;
 import pac.man.ResourceManager;
 import pac.man.ctrl.MovementAlgorithm;
@@ -29,7 +30,7 @@ public class GameState {
     public static final int GOLD_VALUE = 10;
     public static final int POWER_VALUE = 25;
     public static final int GHOST_VALUE = 100;
-    public static final int POWERUP_DURATION = 3000;
+    public static final int POWERUP_DURATION = 6000;
     public static final int POWERUP_THRESHOLD = 750;
     public static final int GHOST_MOVE_INTERVAL = 175;
 
@@ -93,15 +94,14 @@ public class GameState {
                 else {
                     lives--;
                     resMgr.playSound(R.raw.death);
+                    PacMan.showMessage("Life lost");
                     
-
                     if(lives <= 0) {
                         player.setAlive(false);
                         player.setSpeed(new Vector(0, 0));
                         running = false;
                     }
                     else {
-                        // TODO Message indication.
                         resetLevel();
                     }
                 }
@@ -226,6 +226,7 @@ public class GameState {
         running = true;
         normalMode = true;
         lives = STARTING_LIVES;
+        score = 0;
 
         player.setSpeed(new Vector(0, 0));
 

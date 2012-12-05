@@ -66,7 +66,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         Map<Character.AnimationType, Animation> animations
             = new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class);
 
-        // FIXME Shit, this is ugly...
+        // XXX: Shit, this is ugly...
         ArrayList<Map<Character.AnimationType, Animation>> ghosts
             = new ArrayList<Map<Character.AnimationType, Animation>>();
         ghosts.add(new EnumMap<Character.AnimationType, Animation>(Character.AnimationType.class));
@@ -168,9 +168,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
             direction.normalize();
             player.handleMove(direction);
-
-            // XXX: test
-            // resMgr.playSound(R.raw.sound);
         }
 
         return true;

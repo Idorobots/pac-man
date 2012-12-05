@@ -1,18 +1,20 @@
 package pac.man.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
-
-import pac.man.util.Animation;
-import pac.man.util.Vector;
 import pac.man.ctrl.CollisionHandler;
 import pac.man.ctrl.StickyCollisions;
+import pac.man.util.Animation;
+import pac.man.util.Vector;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 
 
 // TODO Random level generator.
@@ -35,11 +37,11 @@ public class Level {
     private int height = 0;
     private int width = 0;
 
-    private ArrayList<Rect> blocks;
-    private ArrayList<Rect> enemySpawns;
-    private ArrayList<Rect> playerSpawns;
-    private ArrayList<Rect> powerSpawns;
-    private ArrayList<Rect> goldSpawns;
+    private List<Rect> blocks;
+    private List<Rect> enemySpawns;
+    private List<Rect> playerSpawns;
+    private List<Rect> powerSpawns;
+    private List<Rect> goldSpawns;
 
     private Animation gold;
     private Animation powerup;
@@ -68,11 +70,11 @@ public class Level {
 
         blockSize = (int) Math.min((double) displayW/(width-1), (double) displayH/(height-1));
 
-        blocks = new ArrayList<Rect>();
-        playerSpawns = new ArrayList<Rect>();
-        enemySpawns = new ArrayList<Rect>();
-        powerSpawns = new ArrayList<Rect>();
-        goldSpawns = new ArrayList<Rect>();
+        blocks = Collections.synchronizedList(new ArrayList<Rect>());
+        playerSpawns = Collections.synchronizedList(new ArrayList<Rect>());
+        enemySpawns = Collections.synchronizedList(new ArrayList<Rect>());
+        powerSpawns = Collections.synchronizedList(new ArrayList<Rect>());
+        goldSpawns = Collections.synchronizedList(new ArrayList<Rect>());
         
         
         init();
@@ -81,7 +83,7 @@ public class Level {
         collisionHandler = new StickyCollisions();
     }
     
-    public void init() {
+    public synchronized void init() {
         blocks.clear();
         playerSpawns.clear();
         enemySpawns.clear();
@@ -126,7 +128,7 @@ public class Level {
         }        
     }
 
-    public void update(long dt, Canvas canvas, Character c) {
+    public synchronized void update(long dt, Canvas canvas, Character c) {
         // Update animations:
         powerup.update(dt);
         gold.update(dt);
@@ -135,35 +137,40 @@ public class Level {
 
         Rect p = c.getBoundingRect();
 
-        for(Rect b : blocks) {
+        Iterator<Rect> blockIter = blocks.iterator();
+        while (blockIter.hasNext()) {
+            Rect b = blockIter.next();
             if(Rect.intersects(p, b)) {
                 collisionHandler.handle(dt, canvas, b, c);
 
                 if(collisionCallback != null) {
                     if(collisionCallback.onWall(c)) {
-                        blocks.remove(b);
+                        blockIter.remove();
                     }
                 }
                 break;
             }
         }
 
-        for(Rect b : powerSpawns) {
+        Iterator<Rect> powerIter = powerSpawns.iterator();
+        while (powerIter.hasNext()) {
+            Rect b = powerIter.next();
             if(Rect.intersects(p, b)) {
                 if(collisionCallback != null) {
                     if(collisionCallback.onPowerup(c)) {
-                        powerSpawns.remove(b);
+                        powerIter.remove();
                     }
                 }
                 break;
             }
         }
 
-        for(Rect b : goldSpawns) {
-            if(Rect.intersects(p, b)) {
+        Iterator<Rect> goldIter = goldSpawns.iterator();
+        while (goldIter.hasNext()) {
+            if(Rect.intersects(p, goldIter.next())) {
                 if(collisionCallback != null) {
                     if(collisionCallback.onGold(c)) {
-                        goldSpawns.remove(b);
+                        goldIter.remove();
                     }
                 }
                 break;
@@ -171,7 +178,7 @@ public class Level {
         }
     }
 
-    public void draw(Canvas canvas) {
+    public synchronized void draw(Canvas canvas) {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
         p.setStyle(Paint.Style.FILL);

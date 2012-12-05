@@ -186,13 +186,14 @@ public class Character {
 
             int index = 1 + (int) (((angle + 45) % 360) / 90);
 
-            // XXX: niezbyt ładne, ale skuteczne ; )
-            AnimationType animationType = null;
+            AnimationType animationType;
             switch (index) {
                 case 1: animationType = AnimationType.RIGHT; break;
                 case 2: animationType = AnimationType.UP; break;
                 case 3: animationType = AnimationType.LEFT; break;
                 case 4: animationType = AnimationType.DOWN; break;
+                default:
+                    throw new IllegalArgumentException();
             }
 
             setActiveAnimation(animationType);

@@ -4,7 +4,7 @@ import pac.man.util.Vector;
 
 public abstract class MovementAlgorithm {
     public static enum Speed {
-        SLOW(50, "Slow"), NORMAL(75, "Normal"), FAST(100, "Fast");
+        SLOW(40, "Slow"), NORMAL(60, "Normal"), FAST(80, "Fast");
 
         private final int gain;
         private final String label;
