@@ -50,7 +50,7 @@ public class Level {
     private CollisionCallback collisionCallback = null;
 
     private Random random = new Random();
-    
+
     Bitmap layout;
     int displayW;
     int displayH;
@@ -64,7 +64,7 @@ public class Level {
         this.layout = layout;
         this.displayW = displayW;
         this.displayH = displayH;
-        
+
         width = layout.getWidth();
         height = layout.getHeight();
 
@@ -75,14 +75,13 @@ public class Level {
         enemySpawns = Collections.synchronizedList(new ArrayList<Rect>());
         powerSpawns = Collections.synchronizedList(new ArrayList<Rect>());
         goldSpawns = Collections.synchronizedList(new ArrayList<Rect>());
-        
-        
+
         init();
-        
+
         // Defaults to sticky collisions.
         collisionHandler = new StickyCollisions();
     }
-    
+
     public synchronized void init() {
         blocks.clear();
         playerSpawns.clear();
@@ -125,7 +124,7 @@ public class Level {
                     default: break;
                 }
             }
-        }        
+        }
     }
 
     public synchronized void update(long dt, Canvas canvas, Character c) {
@@ -182,7 +181,7 @@ public class Level {
         Paint p = new Paint();
         p.setColor(Color.BLUE);
         p.setStyle(Paint.Style.FILL);
-        
+
         for(Rect r : blocks) {
             canvas.drawRect(r, p);
         }
