@@ -1,4 +1,4 @@
-pac-man
+Pac-Man
 =======
 
-A simple PacMan clone for Android
+A Pac-Man game with a kick.
